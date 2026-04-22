@@ -18,6 +18,9 @@
     --prog-bg: #FFF3CD; --prog-txt: #856404;
     --todo-bg: #FDECEA; --todo-txt: #C62828;
     --hold-bg: #FFE0B2; --hold-txt: #E65100;
+    --urg-bg: #FFEBEE; --urg-txt: #C62828; --urg-border: #EF5350;
+    --norm-bg: #FFF8E1; --norm-txt: #F57C00; --norm-border: #FFB74D;
+    --low-bg: #E8F5E9; --low-txt: #2E7D32; --low-border: #81C784;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -56,9 +59,18 @@
     padding: 6px 16px; border-radius: 6px; border: none; cursor: pointer;
     font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 500;
     transition: all 0.2s; background: transparent; color: #7A9CC6;
+    position: relative;
   }
   .nav-tab.active { background: var(--sol-yellow); color: var(--deep-galaxy); }
   .nav-tab:hover:not(.active) { background: rgba(255,255,255,0.08); color: var(--white); }
+  .nav-tab-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 18px; height: 18px; padding: 0 5px;
+    border-radius: 9px; background: #EF5350; color: #fff;
+    font-size: 10px; font-weight: 700; margin-left: 6px;
+    font-family: 'DM Mono', monospace;
+  }
+  .nav-tab-badge.warn { background: #FF9800; }
 
   .nav-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
   .nav-action-btn {
@@ -67,9 +79,23 @@
     background: transparent; color: #B0C4DE;
     font-size: 11px; font-family: 'Noto Sans KR', sans-serif;
     cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    position: relative;
   }
   .nav-action-btn:hover { background: rgba(255,255,255,0.1); color: var(--white); }
   .nav-action-btn.import-btn:hover { border-color: var(--clear-skies); color: var(--clear-skies); }
+  .nav-action-btn.asana-btn {
+    border-color: rgba(244, 84, 97, 0.4);
+    color: #F45461;
+  }
+  .nav-action-btn.asana-btn:hover { background: rgba(244, 84, 97, 0.12); color: #FF7A8A; }
+  .asana-new-badge {
+    position: absolute; top: -6px; right: -6px;
+    min-width: 16px; height: 16px; padding: 0 4px;
+    border-radius: 8px; background: #EF5350; color: #fff;
+    font-size: 10px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace;
+  }
 
   .sync-status {
     font-size: 11px;
@@ -118,7 +144,7 @@
   .summary-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 16px; margin-bottom: 32px;
+    gap: 16px; margin-bottom: 24px;
   }
   .summary-card {
     background: rgba(255,255,255,0.05);
@@ -157,6 +183,27 @@
   .prog .summary-bar-fill { background: var(--sol-yellow); }
   .todo .summary-bar-fill { background: #EF5350; }
   .hold .summary-bar-fill { background: #FF9800; }
+
+  .alert-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px;
+  }
+  .alert-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px; padding: 14px 18px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .alert-card.urgent { border-left: 4px solid #EF5350; }
+  .alert-card.overdue { border-left: 4px solid #FF9800; }
+  .alert-icon { font-size: 22px; }
+  .alert-text { flex: 1; }
+  .alert-title { font-size: 12px; font-weight: 700; color: #B0C4DE; margin-bottom: 2px; }
+  .alert-num {
+    font-size: 22px; font-weight: 900; font-family: 'DM Mono', monospace;
+    color: var(--white);
+  }
+  .alert-card.urgent .alert-num { color: #EF5350; }
+  .alert-card.overdue .alert-num { color: #FF9800; }
 
   .section-progress {
     background: rgba(255,255,255,0.04);
@@ -199,6 +246,9 @@
     background: var(--sol-yellow); border-color: var(--sol-yellow);
     color: var(--deep-galaxy); font-weight: 700;
   }
+  .filter-sep {
+    width: 1px; height: 18px; background: rgba(255,255,255,0.12); margin: 0 4px;
+  }
   .add-btn {
     margin-left: auto; padding: 8px 20px;
     background: var(--sol-yellow); color: var(--deep-galaxy);
@@ -232,12 +282,27 @@
     color: #7A9CC6; text-align: left;
     letter-spacing: 0.06em; text-transform: uppercase;
   }
-  .task-table tbody tr { border-top: 1px solid rgba(255,255,255,0.04); transition: background 0.15s; }
+  .task-table tbody tr {
+    border-top: 1px solid rgba(255,255,255,0.04);
+    transition: background 0.15s;
+    position: relative;
+  }
   .task-table tbody tr:hover { background: rgba(255,255,255,0.04); }
   .task-table td { padding: 10px 14px; font-size: 13px; color: #C8D8EA; vertical-align: middle; }
   .cat-cell { font-size: 11px; font-weight: 700; white-space: nowrap; }
-  .task-cell { max-width: 420px; line-height: 1.5; }
-  .note-cell { font-size: 11px; color: #7A9CC6; max-width: 160px; }
+  .task-cell { max-width: 360px; line-height: 1.5; }
+  .note-cell { font-size: 11px; color: #7A9CC6; max-width: 140px; }
+  .due-cell {
+    font-size: 11px; font-family: 'DM Mono', monospace; color: #B0C4DE;
+    white-space: nowrap;
+  }
+  .due-cell.overdue { color: #EF5350; font-weight: 700; }
+  .due-cell.soon { color: #FF9800; font-weight: 700; }
+  .due-cell.empty { color: #4A6A8A; }
+
+  .task-row.is-urgent { box-shadow: inset 3px 0 0 #EF5350; }
+  .task-row.is-overdue { background: rgba(239, 83, 80, 0.07); }
+  .task-row.is-overdue:hover { background: rgba(239, 83, 80, 0.12); }
 
   .badge {
     display: inline-flex; align-items: center; gap: 5px;
@@ -251,6 +316,27 @@
   .badge.진행중 { background: var(--prog-bg); color: var(--prog-txt); }
   .badge.미완료 { background: var(--todo-bg); color: var(--todo-txt); }
   .badge.보류   { background: var(--hold-bg); color: var(--hold-txt); }
+
+  .prio-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 9px; border-radius: 20px;
+    font-size: 11px; font-weight: 700; white-space: nowrap;
+    cursor: pointer; transition: all 0.15s; border: 1px solid transparent;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+  .prio-badge:hover { filter: brightness(1.05); transform: scale(1.05); }
+  .prio-badge.긴급 { background: var(--urg-bg); color: var(--urg-txt); border-color: var(--urg-border); }
+  .prio-badge.보통 { background: var(--norm-bg); color: var(--norm-txt); border-color: var(--norm-border); }
+  .prio-badge.낮음 { background: var(--low-bg); color: var(--low-txt); border-color: var(--low-border); }
+
+  .asana-link {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 4px;
+    background: rgba(244, 84, 97, 0.15); color: #F45461;
+    text-decoration: none; font-size: 11px; font-weight: 700;
+    margin-left: 6px; transition: all 0.15s;
+  }
+  .asana-link:hover { background: rgba(244, 84, 97, 0.3); transform: scale(1.1); }
 
   .action-btns { display: flex; gap: 4px; }
   .act-btn {
@@ -276,12 +362,15 @@
     width: 560px; max-width: 95vw;
     max-height: 90vh; overflow-y: auto;
   }
+  .modal.large { width: 720px; }
   .modal-title {
     font-size: 18px; font-weight: 700; color: var(--white);
     margin-bottom: 24px; padding-bottom: 14px;
     border-bottom: 1px solid rgba(255,255,255,0.1);
   }
   .form-group { margin-bottom: 16px; }
+  .form-row { display: flex; gap: 12px; }
+  .form-row .form-group { flex: 1; margin-bottom: 0; }
   .form-label {
     display: block; font-size: 12px; font-weight: 700;
     color: #7A9CC6; letter-spacing: 0.05em;
@@ -295,8 +384,30 @@
     font-size: 13px; outline: none; transition: border-color 0.2s;
   }
   .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--sol-yellow); }
+  .form-input[type="date"] { color-scheme: dark; }
   .form-textarea { resize: vertical; min-height: 80px; }
   .form-select option { background: #1A2E4A; }
+
+  .prio-group { display: flex; gap: 8px; }
+  .prio-option {
+    flex: 1; padding: 9px 12px; border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.04);
+    color: #B0C4DE; font-size: 13px; font-weight: 500;
+    cursor: pointer; text-align: center; transition: all 0.15s;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+  .prio-option:hover { border-color: rgba(255,255,255,0.25); }
+  .prio-option.selected.긴급 {
+    background: var(--urg-bg); color: var(--urg-txt); border-color: var(--urg-border); font-weight: 700;
+  }
+  .prio-option.selected.보통 {
+    background: var(--norm-bg); color: var(--norm-txt); border-color: var(--norm-border); font-weight: 700;
+  }
+  .prio-option.selected.낮음 {
+    background: var(--low-bg); color: var(--low-txt); border-color: var(--low-border); font-weight: 700;
+  }
+
   .modal-btns { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
   .btn-cancel {
     padding: 9px 20px; border-radius: 8px;
@@ -321,6 +432,58 @@
     background: rgba(0,0,0,0.3); padding: 1px 6px; border-radius: 4px;
     font-family: 'DM Mono', monospace; font-size: 11px; color: #B0C4DE;
   }
+
+  .asana-list {
+    max-height: 360px; overflow-y: auto;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px; background: rgba(0,0,0,0.15);
+  }
+  .asana-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: background 0.15s;
+  }
+  .asana-item:last-child { border-bottom: none; }
+  .asana-item:hover { background: rgba(255,255,255,0.04); }
+  .asana-item.imported { opacity: 0.4; }
+  .asana-item input[type="checkbox"] { margin-top: 3px; cursor: pointer; }
+  .asana-item-body { flex: 1; min-width: 0; }
+  .asana-item-name {
+    font-size: 13px; color: var(--white); font-weight: 500;
+    margin-bottom: 4px; word-break: break-word;
+  }
+  .asana-item-meta {
+    font-size: 11px; color: #7A9CC6;
+    display: flex; gap: 10px; flex-wrap: wrap;
+  }
+  .asana-item-meta .meta-due.overdue { color: #EF5350; font-weight: 700; }
+  .asana-item-meta .meta-imported { color: #4CAF50; font-weight: 700; }
+  .asana-item-section-select {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px; padding: 4px 8px;
+    color: var(--white); font-size: 11px; outline: none;
+    font-family: 'Noto Sans KR', sans-serif;
+    flex-shrink: 0;
+  }
+  .asana-empty {
+    padding: 40px; text-align: center; color: #7A9CC6; font-size: 13px;
+  }
+
+  .asana-bulk-bar {
+    display: flex; align-items: center; gap: 12px;
+    padding: 8px 0; margin-bottom: 10px;
+    font-size: 12px; color: #7A9CC6;
+  }
+  .asana-bulk-bar button {
+    padding: 4px 10px; border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: transparent; color: #B0C4DE;
+    font-size: 11px; cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+  .asana-bulk-bar button:hover { background: rgba(255,255,255,0.08); }
 
   .empty { text-align: center; padding: 40px; color: #7A9CC6; font-size: 13px; }
 
@@ -365,7 +528,7 @@
 
   @media print {
     nav, .filter-bar, .action-btns, .add-btn, .print-btn,
-    .period-editor, #view-dashboard { display: none !important; }
+    .period-editor, .alert-grid, #view-dashboard { display: none !important; }
     body { background: #fff; color: #000; }
     main { padding: 0; }
     .view-content { display: block !important; }
@@ -381,10 +544,14 @@
     .badge.진행중 { background: #FFF3CD; color: #856404; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .badge.미완료 { background: #FDECEA; color: #C62828; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .badge.보류   { background: #FFE0B2; color: #E65100; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .prio-badge.긴급 { background: #FFEBEE; color: #C62828; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .prio-badge.보통 { background: #FFF8E1; color: #F57C00; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .prio-badge.낮음 { background: #E8F5E9; color: #2E7D32; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   }
 
   @media (max-width: 900px) {
     .summary-grid { grid-template-columns: repeat(3, 1fr); }
+    .alert-grid { grid-template-columns: 1fr; }
   }
   @media (max-width: 768px) {
     .summary-grid { grid-template-columns: repeat(2, 1fr); }
@@ -403,11 +570,16 @@
     <div class="nav-title">PROMEGA KOREA — 주간 업무 보고</div>
   </div>
   <div class="nav-tabs">
-    <button class="nav-tab active" onclick="switchView('dashboard')">대시보드</button>
+    <button class="nav-tab active" onclick="switchView('dashboard')">
+      대시보드<span class="nav-tab-badge" id="navUrgentBadge" style="display:none">0</span>
+    </button>
     <button class="nav-tab" onclick="switchView('report')">보고서</button>
   </div>
   <div class="nav-actions">
     <span class="sync-status sync-loading" id="syncStatus" onclick="openTokenModal()" title="클릭하여 GitHub 토큰 설정">⟳ 불러오는 중...</span>
+    <button class="nav-action-btn asana-btn" onclick="openAsanaImport()" title="Asana에서 업무 가져오기">
+      ◎ Asana<span class="asana-new-badge" id="asanaNewBadge" style="display:none">0</span>
+    </button>
     <button class="nav-action-btn" onclick="exportData()" title="JSON 백업 파일로 저장">↓ 내보내기</button>
     <button class="nav-action-btn import-btn" onclick="triggerImport()" title="JSON 백업 파일에서 불러오기">↑ 불러오기</button>
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
@@ -456,18 +628,41 @@
       </div>
     </div>
 
+    <div class="alert-grid">
+      <div class="alert-card urgent">
+        <div class="alert-icon">🔴</div>
+        <div class="alert-text">
+          <div class="alert-title">긴급 업무 (미완료)</div>
+          <div class="alert-num" id="cntUrgent">0</div>
+        </div>
+      </div>
+      <div class="alert-card overdue">
+        <div class="alert-icon">⏰</div>
+        <div class="alert-text">
+          <div class="alert-title">기한 초과 업무</div>
+          <div class="alert-num" id="cntOverdue">0</div>
+        </div>
+      </div>
+    </div>
+
     <div class="section-progress">
       <div class="section-progress-title">섹션별 진행률</div>
       <div id="sectionProgress"></div>
     </div>
 
     <div class="filter-bar">
-      <span class="filter-label">필터</span>
-      <button class="filter-btn active" onclick="setFilter('전체')">전체</button>
-      <button class="filter-btn" onclick="setFilter('완료')">완료</button>
-      <button class="filter-btn" onclick="setFilter('진행중')">진행중</button>
-      <button class="filter-btn" onclick="setFilter('미완료')">미완료</button>
-      <button class="filter-btn" onclick="setFilter('보류')">보류</button>
+      <span class="filter-label">상태</span>
+      <button class="filter-btn active" data-filter="status" data-value="전체" onclick="setFilter('status','전체')">전체</button>
+      <button class="filter-btn" data-filter="status" data-value="완료" onclick="setFilter('status','완료')">완료</button>
+      <button class="filter-btn" data-filter="status" data-value="진행중" onclick="setFilter('status','진행중')">진행중</button>
+      <button class="filter-btn" data-filter="status" data-value="미완료" onclick="setFilter('status','미완료')">미완료</button>
+      <button class="filter-btn" data-filter="status" data-value="보류" onclick="setFilter('status','보류')">보류</button>
+      <div class="filter-sep"></div>
+      <span class="filter-label">우선순위</span>
+      <button class="filter-btn active" data-filter="priority" data-value="전체" onclick="setFilter('priority','전체')">전체</button>
+      <button class="filter-btn" data-filter="priority" data-value="긴급" onclick="setFilter('priority','긴급')">🔴 긴급</button>
+      <button class="filter-btn" data-filter="priority" data-value="보통" onclick="setFilter('priority','보통')">🟡 보통</button>
+      <button class="filter-btn" data-filter="priority" data-value="낮음" onclick="setFilter('priority','낮음')">🟢 낮음</button>
       <button class="add-btn" onclick="openModal()">＋ 업무 추가</button>
     </div>
 
@@ -518,14 +713,29 @@
       <label class="form-label">세부 업무 내용</label>
       <textarea class="form-textarea" id="fTask" placeholder="업무 내용을 입력하세요"></textarea>
     </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">상태</label>
+        <select class="form-select" id="fStatus">
+          <option value="미완료">미완료</option>
+          <option value="진행중">진행중</option>
+          <option value="완료">완료</option>
+          <option value="보류">보류</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">마감일 (선택)</label>
+        <input class="form-input" type="date" id="fDueDate">
+      </div>
+    </div>
     <div class="form-group">
-      <label class="form-label">상태</label>
-      <select class="form-select" id="fStatus">
-        <option value="미완료">미완료</option>
-        <option value="진행중">진행중</option>
-        <option value="완료">완료</option>
-        <option value="보류">보류</option>
-      </select>
+      <label class="form-label">우선순위</label>
+      <div class="prio-group" id="fPrioGroup">
+        <button type="button" class="prio-option 긴급" data-val="긴급" onclick="selectPriority('긴급')">🔴 긴급</button>
+        <button type="button" class="prio-option 보통 selected" data-val="보통" onclick="selectPriority('보통')">🟡 보통</button>
+        <button type="button" class="prio-option 낮음" data-val="낮음" onclick="selectPriority('낮음')">🟢 낮음</button>
+      </div>
+      <input type="hidden" id="fPriority" value="보통">
     </div>
     <div class="form-group">
       <label class="form-label">비고</label>
@@ -565,6 +775,67 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="asanaTokenModalOverlay">
+  <div class="modal">
+    <div class="modal-title">Asana 연동 설정</div>
+    <div class="form-group">
+      <label class="form-label">Personal Access Token (PAT)</label>
+      <input class="form-input" id="asanaTokenInput" type="password" placeholder="1/xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+      <div class="help-text">
+        <strong>토큰 발급 방법:</strong><br>
+        1. <a href="https://app.asana.com/0/my-apps" target="_blank">Asana 개발자 콘솔</a>로 이동<br>
+        2. <strong>+ Create new token</strong> 클릭 → 이름 입력 (예: <code>PK Dashboard</code>)<br>
+        3. 생성된 토큰을 복사하여 위 칸에 붙여넣기<br><br>
+        ※ 토큰은 이 브라우저에만 저장됩니다.<br>
+        ※ 연동 시 내게 할당된 미완료 업무를 가져옵니다.
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">워크스페이스 (자동 감지)</label>
+      <select class="form-select" id="asanaWorkspaceSelect" disabled>
+        <option>토큰 입력 후 자동 감지됩니다</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">현재 상태</label>
+      <div class="help-text" id="asanaTokenStatusText">확인 중...</div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="clearAsanaToken()" style="color:#EF5350; border-color:rgba(239,83,80,0.3)">토큰 삭제</button>
+      <button class="btn-cancel" onclick="closeAsanaTokenModal()">취소</button>
+      <button class="btn-save" onclick="saveAsanaToken()">저장</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="asanaImportModalOverlay">
+  <div class="modal large">
+    <div class="modal-title">
+      Asana 업무 가져오기
+      <span style="float:right; font-size:12px; font-weight:500; color:#7A9CC6;">
+        <a href="#" onclick="event.preventDefault(); openAsanaTokenModal()" style="color:var(--sol-yellow); text-decoration:none;">⚙ 설정</a>
+      </span>
+    </div>
+    <div class="asana-bulk-bar">
+      <button onclick="refreshAsanaTasks()">🔄 새로고침</button>
+      <button onclick="selectAllAsana(true)">전체 선택</button>
+      <button onclick="selectAllAsana(false)">전체 해제</button>
+      <span id="asanaLoadStatus" style="margin-left:auto; font-family:'DM Mono',monospace;">—</span>
+    </div>
+    <div class="asana-list" id="asanaList">
+      <div class="asana-empty">Asana 토큰이 필요합니다. 우측 상단 ⚙ 설정을 클릭하세요.</div>
+    </div>
+    <div class="help-text" style="margin-top:10px">
+      ※ 이미 가져온 업무는 회색 처리되어 중복 추가되지 않습니다.<br>
+      ※ 5분마다 새 할당 업무가 있는지 자동 확인합니다 (탭이 활성 상태일 때만).
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeAsanaImportModal()">취소</button>
+      <button class="btn-save" onclick="importSelectedAsana()">선택 항목 가져오기</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -574,6 +845,12 @@ const GH_DATA_PATH = 'public/data/tasks.json';
 const GH_API = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_DATA_PATH}`;
 const TOKEN_KEY = 'pk_gh_token';
 const LOCAL_CACHE_KEY = 'pk_tasks_cache';
+
+const ASANA_TOKEN_KEY = 'pk_asana_token';
+const ASANA_WS_KEY = 'pk_asana_workspace';
+const ASANA_SEEN_KEY = 'pk_asana_seen_gids';
+const ASANA_API = 'https://app.asana.com/api/1.0';
+const ASANA_POLL_MS = 5 * 60 * 1000;
 
 const SECTIONS = [
   { id: '대한약학회',          name: '대한약학회 (춘계)',                    sub: '4월 23~24일 • 청주 OSCO',      color: '#1565C0' },
@@ -586,20 +863,41 @@ const SECTIONS = [
   { id: '내부 미팅',           name: '내부 미팅',                            sub: '',                              color: '#424242' },
   { id: '블로그/콘텐츠',       name: '블로그 / 콘텐츠 제작',                 sub: 'Ask Promega 네이버 블로그',     color: '#E65100' },
   { id: 'IT/시스템',           name: 'IT / 시스템',                          sub: '',                              color: '#4527A0' },
+  { id: 'Asana',               name: 'Asana 가져온 업무',                    sub: '기본 섹션',                     color: '#F45461' },
 ];
 
 const DEFAULT_PERIOD = '2026.04.13 — 04.17';
+const STATUS_CYCLE = { '미완료':'진행중', '진행중':'완료', '완료':'미완료', '보류':'미완료' };
+const PRIO_CYCLE = { '긴급':'보통', '보통':'낮음', '낮음':'긴급' };
+const PRIO_RANK = { '긴급':0, '보통':1, '낮음':2 };
 
 let tasks = [];
 let reportPeriod = DEFAULT_PERIOD;
-let currentFilter = '전체';
+let currentFilters = { status: '전체', priority: '전체' };
 let nextId = 100;
 let syncSha = null;
 let syncTimer = null;
 let lastSyncAt = null;
 
+let asanaWorkspaces = [];
+let asanaSelectedWs = '';
+let asanaFetchedTasks = [];
+let asanaPollTimer = null;
+
 function getToken() {
   try { return localStorage.getItem(TOKEN_KEY) || ''; } catch(e) { return ''; }
+}
+function getAsanaToken() {
+  try { return localStorage.getItem(ASANA_TOKEN_KEY) || ''; } catch(e) { return ''; }
+}
+function getAsanaWorkspace() {
+  try { return localStorage.getItem(ASANA_WS_KEY) || ''; } catch(e) { return ''; }
+}
+function getAsanaSeenGids() {
+  try { return JSON.parse(localStorage.getItem(ASANA_SEEN_KEY) || '[]'); } catch(e) { return []; }
+}
+function setAsanaSeenGids(arr) {
+  try { localStorage.setItem(ASANA_SEEN_KEY, JSON.stringify(arr)); } catch(e) {}
 }
 
 function escHtml(s) {
@@ -613,6 +911,47 @@ function showToast(msg) {
   el.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+function todayStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function daysUntil(dateStr) {
+  if (!dateStr) return null;
+  const [y,m,d] = dateStr.split('-').map(Number);
+  const t = new Date(); t.setHours(0,0,0,0);
+  const due = new Date(y, m-1, d); due.setHours(0,0,0,0);
+  return Math.round((due - t) / 86400000);
+}
+
+function isOverdue(task) {
+  if (!task.dueDate || task.status === '완료') return false;
+  return daysUntil(task.dueDate) < 0;
+}
+
+function isUrgent(task) {
+  return task.priority === '긴급' && task.status !== '완료';
+}
+
+function formatDueCell(task) {
+  if (!task.dueDate) return '<span class="due-cell empty">—</span>';
+  const d = daysUntil(task.dueDate);
+  let cls = '';
+  let extra = '';
+  if (task.status === '완료') {
+    cls = '';
+  } else if (d < 0) {
+    cls = 'overdue';
+    extra = ` (${Math.abs(d)}일 지남)`;
+  } else if (d <= 2) {
+    cls = 'soon';
+    extra = d === 0 ? ' (오늘)' : ` (D-${d})`;
+  } else {
+    extra = ` (D-${d})`;
+  }
+  return `<span class="due-cell ${cls}">${task.dueDate}${extra}</span>`;
 }
 
 function setSyncStatus(status, customText) {
@@ -639,7 +978,6 @@ async function loadFromGitHub() {
     if (token) headers.Authorization = `token ${token}`;
     const resp = await fetch(GH_API + `?t=${Date.now()}`, { headers });
     if (resp.status === 404) {
-      console.log('[Sync] tasks.json not found yet');
       loadFromCache();
       setSyncStatus(token ? 'synced' : 'readonly');
       return false;
@@ -649,7 +987,7 @@ async function loadFromGitHub() {
     syncSha = info.sha;
     const decoded = decodeURIComponent(escape(atob(info.content.replace(/\n/g, ''))));
     const parsed = JSON.parse(decoded);
-    tasks = Array.isArray(parsed.tasks) ? parsed.tasks : [];
+    tasks = Array.isArray(parsed.tasks) ? parsed.tasks.map(migrateTask) : [];
     reportPeriod = parsed.period || DEFAULT_PERIOD;
     nextId = tasks.length ? Math.max(...tasks.map(t => t.id || 0), 99) + 1 : 100;
     cacheLocally();
@@ -664,12 +1002,27 @@ async function loadFromGitHub() {
   }
 }
 
+function migrateTask(t) {
+  return {
+    id: t.id,
+    section: t.section || '',
+    cat: t.cat || '',
+    task: t.task || '',
+    status: t.status || '미완료',
+    note: t.note || '',
+    dueDate: t.dueDate || '',
+    priority: t.priority || '보통',
+    asanaGid: t.asanaGid || '',
+    asanaUrl: t.asanaUrl || '',
+  };
+}
+
 async function saveToGitHub() {
   const token = getToken();
   if (!token) { setSyncStatus('readonly'); return; }
   setSyncStatus('syncing');
   const payload = {
-    version: 2,
+    version: 3,
     period: reportPeriod,
     tasks,
     updatedAt: new Date().toISOString(),
@@ -743,7 +1096,7 @@ function loadFromCache() {
     const raw = localStorage.getItem(LOCAL_CACHE_KEY);
     if (!raw) return false;
     const parsed = JSON.parse(raw);
-    tasks = parsed.tasks || [];
+    tasks = (parsed.tasks || []).map(migrateTask);
     reportPeriod = parsed.period || DEFAULT_PERIOD;
     nextId = tasks.length ? Math.max(...tasks.map(t => t.id || 0), 99) + 1 : 100;
     return true;
@@ -787,11 +1140,270 @@ function clearToken() {
   showToast('토큰이 삭제되었습니다.');
 }
 
+async function asanaFetch(path, opts={}) {
+  const token = getAsanaToken();
+  if (!token) throw new Error('No Asana token');
+  const resp = await fetch(ASANA_API + path, {
+    ...opts,
+    headers: {
+      ...(opts.headers || {}),
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/json',
+    },
+  });
+  if (!resp.ok) {
+    const txt = await resp.text();
+    throw new Error(`Asana ${resp.status}: ${txt.slice(0,200)}`);
+  }
+  return resp.json();
+}
+
+function openAsanaTokenModal() {
+  const current = getAsanaToken();
+  document.getElementById('asanaTokenInput').value = current;
+  const statusEl = document.getElementById('asanaTokenStatusText');
+  if (current) {
+    statusEl.innerHTML = `<strong style="color:#4CAF50;">✓ 토큰이 설정됨</strong> — Asana 연동 활성화`;
+  } else {
+    statusEl.innerHTML = `<strong style="color:#FF9800;">⚠ 토큰 미설정</strong>`;
+  }
+  const wsSel = document.getElementById('asanaWorkspaceSelect');
+  if (current) {
+    loadAsanaWorkspaces().catch(err => {
+      statusEl.innerHTML = `<strong style="color:#EF5350;">✗ 연결 실패</strong> — ${escHtml(err.message)}`;
+    });
+  } else {
+    wsSel.disabled = true;
+    wsSel.innerHTML = '<option>토큰 입력 후 자동 감지됩니다</option>';
+  }
+  document.getElementById('asanaTokenModalOverlay').classList.add('open');
+}
+
+function closeAsanaTokenModal() {
+  document.getElementById('asanaTokenModalOverlay').classList.remove('open');
+}
+
+async function loadAsanaWorkspaces() {
+  const data = await asanaFetch('/users/me?opt_fields=workspaces.name,workspaces.gid');
+  asanaWorkspaces = data.data.workspaces || [];
+  const wsSel = document.getElementById('asanaWorkspaceSelect');
+  wsSel.disabled = false;
+  const saved = getAsanaWorkspace();
+  wsSel.innerHTML = asanaWorkspaces.map(w => {
+    const sel = (saved === w.gid) || (!saved && asanaWorkspaces.length === 1);
+    return `<option value="${w.gid}" ${sel?'selected':''}>${escHtml(w.name)}</option>`;
+  }).join('');
+  asanaSelectedWs = wsSel.value;
+  document.getElementById('asanaTokenStatusText').innerHTML =
+    `<strong style="color:#4CAF50;">✓ 연결됨</strong> — 워크스페이스 ${asanaWorkspaces.length}개 감지`;
+}
+
+async function saveAsanaToken() {
+  const val = document.getElementById('asanaTokenInput').value.trim();
+  if (!val) { alert('토큰을 입력해주세요.'); return; }
+  localStorage.setItem(ASANA_TOKEN_KEY, val);
+  try {
+    await loadAsanaWorkspaces();
+    const ws = document.getElementById('asanaWorkspaceSelect').value;
+    if (ws) localStorage.setItem(ASANA_WS_KEY, ws);
+    closeAsanaTokenModal();
+    showToast('Asana 토큰 저장 완료');
+    startAsanaPolling();
+    checkAsanaNew();
+  } catch(err) {
+    alert('토큰 검증 실패: ' + err.message);
+  }
+}
+
+function clearAsanaToken() {
+  if (!confirm('Asana 토큰을 삭제하시겠습니까?')) return;
+  localStorage.removeItem(ASANA_TOKEN_KEY);
+  localStorage.removeItem(ASANA_WS_KEY);
+  closeAsanaTokenModal();
+  stopAsanaPolling();
+  updateAsanaBadge(0);
+  showToast('Asana 토큰이 삭제되었습니다.');
+}
+
+async function openAsanaImport() {
+  if (!getAsanaToken()) { openAsanaTokenModal(); return; }
+  if (!getToken()) { showToast('읽기 전용 모드입니다. GitHub 토큰을 먼저 설정하세요.'); return; }
+  document.getElementById('asanaImportModalOverlay').classList.add('open');
+  await refreshAsanaTasks();
+}
+
+function closeAsanaImportModal() {
+  document.getElementById('asanaImportModalOverlay').classList.remove('open');
+}
+
+async function refreshAsanaTasks() {
+  const listEl = document.getElementById('asanaList');
+  const statusEl = document.getElementById('asanaLoadStatus');
+  statusEl.textContent = '가져오는 중...';
+  listEl.innerHTML = '<div class="asana-empty">로딩 중...</div>';
+  try {
+    const ws = getAsanaWorkspace() || asanaSelectedWs;
+    if (!ws) {
+      await loadAsanaWorkspaces();
+      const w = document.getElementById('asanaWorkspaceSelect').value;
+      if (w) { localStorage.setItem(ASANA_WS_KEY, w); asanaSelectedWs = w; }
+    }
+    const finalWs = getAsanaWorkspace();
+    if (!finalWs) throw new Error('워크스페이스가 선택되지 않았습니다');
+    const fields = 'name,notes,due_on,permalink_url,completed,projects.name,assignee_status';
+    const data = await asanaFetch(
+      `/tasks?assignee=me&workspace=${finalWs}&completed_since=now&limit=100&opt_fields=${fields}`
+    );
+    asanaFetchedTasks = (data.data || []).filter(t => !t.completed);
+    renderAsanaList();
+    statusEl.textContent = `${asanaFetchedTasks.length}건`;
+    const seen = asanaFetchedTasks.map(t => t.gid);
+    setAsanaSeenGids(seen);
+    updateAsanaBadge(0);
+  } catch(err) {
+    console.error('[Asana] fetch error:', err);
+    listEl.innerHTML = `<div class="asana-empty" style="color:#EF5350">✗ ${escHtml(err.message)}</div>`;
+    statusEl.textContent = '오류';
+  }
+}
+
+function renderAsanaList() {
+  const listEl = document.getElementById('asanaList');
+  if (!asanaFetchedTasks.length) {
+    listEl.innerHTML = '<div class="asana-empty">할당된 미완료 업무가 없습니다.</div>';
+    return;
+  }
+  const importedGids = new Set(tasks.filter(t => t.asanaGid).map(t => t.asanaGid));
+  const sectionOpts = SECTIONS.map(s => `<option value="${escHtml(s.id)}">${escHtml(s.name)}</option>`).join('');
+  listEl.innerHTML = asanaFetchedTasks.map(t => {
+    const already = importedGids.has(t.gid);
+    const due = t.due_on ? `<span class="meta-due ${t.due_on < todayStr() ? 'overdue' : ''}">📅 ${t.due_on}</span>` : '';
+    const project = (t.projects && t.projects[0]) ? `<span>📁 ${escHtml(t.projects[0].name)}</span>` : '';
+    const guessedSection = guessSection(t);
+    return `<div class="asana-item ${already ? 'imported' : ''}">
+      <input type="checkbox" data-gid="${t.gid}" ${already ? 'disabled' : ''} ${!already ? 'checked' : ''}>
+      <div class="asana-item-body">
+        <div class="asana-item-name">${escHtml(t.name)}</div>
+        <div class="asana-item-meta">
+          ${due}
+          ${project}
+          ${already ? '<span class="meta-imported">✓ 가져옴</span>' : ''}
+          <a href="${escHtml(t.permalink_url)}" target="_blank" style="color:#F45461; text-decoration:none;">↗ Asana에서 보기</a>
+        </div>
+      </div>
+      <select class="asana-item-section-select" data-gid="${t.gid}" ${already ? 'disabled' : ''}>
+        ${SECTIONS.map(s => `<option value="${escHtml(s.id)}" ${s.id === guessedSection ? 'selected' : ''}>${escHtml(s.name)}</option>`).join('')}
+      </select>
+    </div>`;
+  }).join('');
+}
+
+function guessSection(asanaTask) {
+  const name = (asanaTask.name || '').toLowerCase();
+  const projectName = (asanaTask.projects && asanaTask.projects[0] ? asanaTask.projects[0].name : '').toLowerCase();
+  const haystack = name + ' ' + projectName;
+  if (/sitecore|promega\.kr|cms/.test(haystack)) return 'Sitecore CMS';
+  if (/약학회|약학/.test(haystack)) return '대한약학회';
+  if (/기초의학/.test(haystack)) return '대한기초의학 학회';
+  if (/adobe|express|dam/.test(haystack)) return 'Adobe Express / DAM';
+  if (/플라이어|flyer/.test(haystack)) return '연구자 플라이어';
+  if (/maxwell|csc/.test(haystack)) return 'Maxwell CSC';
+  if (/대리점/.test(haystack)) return '대리점 교육';
+  if (/미팅|meeting|회의/.test(haystack)) return '내부 미팅';
+  if (/블로그|blog|콘텐츠|content/.test(haystack)) return '블로그/콘텐츠';
+  if (/it\b|시스템|system/.test(haystack)) return 'IT/시스템';
+  return 'Asana';
+}
+
+function selectAllAsana(val) {
+  document.querySelectorAll('#asanaList input[type="checkbox"]:not([disabled])').forEach(cb => { cb.checked = val; });
+}
+
+function importSelectedAsana() {
+  const checkboxes = document.querySelectorAll('#asanaList input[type="checkbox"]:checked:not([disabled])');
+  if (!checkboxes.length) { showToast('선택된 항목이 없습니다.'); return; }
+  let added = 0;
+  checkboxes.forEach(cb => {
+    const gid = cb.dataset.gid;
+    const asanaTask = asanaFetchedTasks.find(t => t.gid === gid);
+    if (!asanaTask) return;
+    if (tasks.some(t => t.asanaGid === gid)) return;
+    const sectionSel = document.querySelector(`.asana-item-section-select[data-gid="${gid}"]`);
+    const section = sectionSel ? sectionSel.value : 'Asana';
+    const cat = (asanaTask.projects && asanaTask.projects[0]) ? asanaTask.projects[0].name : 'Asana';
+    tasks.push({
+      id: nextId++,
+      section,
+      cat: cat.slice(0, 20),
+      task: asanaTask.name || '(제목 없음)',
+      status: '미완료',
+      note: asanaTask.notes ? asanaTask.notes.slice(0, 80) : '',
+      dueDate: asanaTask.due_on || '',
+      priority: '보통',
+      asanaGid: gid,
+      asanaUrl: asanaTask.permalink_url || '',
+    });
+    added++;
+  });
+  if (added > 0) {
+    render(); scheduleSave();
+    showToast(`${added}건의 Asana 업무를 가져왔습니다.`);
+    closeAsanaImportModal();
+  } else {
+    showToast('새로 추가된 업무가 없습니다.');
+  }
+}
+
+function updateAsanaBadge(n) {
+  const el = document.getElementById('asanaNewBadge');
+  if (!el) return;
+  if (n > 0) {
+    el.textContent = n > 99 ? '99+' : n;
+    el.style.display = 'flex';
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+async function checkAsanaNew() {
+  if (!getAsanaToken()) return;
+  try {
+    const ws = getAsanaWorkspace();
+    if (!ws) return;
+    const data = await asanaFetch(
+      `/tasks?assignee=me&workspace=${ws}&completed_since=now&limit=100&opt_fields=gid,completed`
+    );
+    const incompleteGids = (data.data || []).filter(t => !t.completed).map(t => t.gid);
+    const importedGids = new Set(tasks.filter(t => t.asanaGid).map(t => t.asanaGid));
+    const seenGids = new Set(getAsanaSeenGids());
+    const newGids = incompleteGids.filter(g => !importedGids.has(g) && !seenGids.has(g));
+    updateAsanaBadge(incompleteGids.filter(g => !importedGids.has(g)).length);
+    if (newGids.length > 0) {
+      showToast(`🔔 Asana 새 업무 ${newGids.length}건 할당됨`);
+    }
+  } catch(err) {
+    console.warn('[Asana] poll error:', err.message);
+  }
+}
+
+function startAsanaPolling() {
+  stopAsanaPolling();
+  if (!getAsanaToken()) return;
+  asanaPollTimer = setInterval(() => {
+    if (!document.hidden) checkAsanaNew();
+  }, ASANA_POLL_MS);
+}
+
+function stopAsanaPolling() {
+  if (asanaPollTimer) { clearInterval(asanaPollTimer); asanaPollTimer = null; }
+}
+
 function render() {
   updateSummary();
   renderSectionProgress();
   renderTaskList();
   renderReport();
+  updateNavBadges();
   document.getElementById('dashPeriod').textContent = reportPeriod;
   document.getElementById('periodInput').value = reportPeriod;
 
@@ -810,16 +1422,34 @@ function updateSummary() {
   const prog  = tasks.filter(t => t.status === '진행중').length;
   const todo  = tasks.filter(t => t.status === '미완료').length;
   const hold  = tasks.filter(t => t.status === '보류').length;
+  const urgent  = tasks.filter(t => isUrgent(t)).length;
+  const overdue = tasks.filter(t => isOverdue(t)).length;
   document.getElementById('cntTotal').textContent = total;
   document.getElementById('cntDone').textContent  = done;
   document.getElementById('cntProg').textContent  = prog;
   document.getElementById('cntTodo').textContent  = todo;
   document.getElementById('cntHold').textContent  = hold;
+  document.getElementById('cntUrgent').textContent  = urgent;
+  document.getElementById('cntOverdue').textContent = overdue;
   const base = total || 1;
   document.getElementById('barDone').style.width = (done/base*100)+'%';
   document.getElementById('barProg').style.width = (prog/base*100)+'%';
   document.getElementById('barTodo').style.width = (todo/base*100)+'%';
   document.getElementById('barHold').style.width = (hold/base*100)+'%';
+}
+
+function updateNavBadges() {
+  const urgent  = tasks.filter(t => isUrgent(t)).length;
+  const overdue = tasks.filter(t => isOverdue(t)).length;
+  const total = urgent + overdue;
+  const el = document.getElementById('navUrgentBadge');
+  if (total > 0) {
+    el.textContent = total;
+    el.style.display = 'inline-flex';
+    el.className = 'nav-tab-badge' + (urgent === 0 ? ' warn' : '');
+  } else {
+    el.style.display = 'none';
+  }
 }
 
 function renderSectionProgress() {
@@ -838,13 +1468,35 @@ function renderSectionProgress() {
   el.innerHTML = html || '<div class="empty" style="padding:16px;">등록된 업무가 없습니다.</div>';
 }
 
+function sortTasks(arr) {
+  return [...arr].sort((a, b) => {
+    const aDone = a.status === '완료' ? 1 : 0;
+    const bDone = b.status === '완료' ? 1 : 0;
+    if (aDone !== bDone) return aDone - bDone;
+    const aOver = isOverdue(a) ? 0 : 1;
+    const bOver = isOverdue(b) ? 0 : 1;
+    if (aOver !== bOver) return aOver - bOver;
+    const pa = PRIO_RANK[a.priority] ?? 1;
+    const pb = PRIO_RANK[b.priority] ?? 1;
+    if (pa !== pb) return pa - pb;
+    const da = a.dueDate || '9999-12-31';
+    const db = b.dueDate || '9999-12-31';
+    if (da !== db) return da < db ? -1 : 1;
+    return (a.id || 0) - (b.id || 0);
+  });
+}
+
 function renderTaskList() {
   const el = document.getElementById('taskList');
-  const filtered = currentFilter === '전체' ? tasks : tasks.filter(t => t.status === currentFilter);
+  const filtered = tasks.filter(t => {
+    if (currentFilters.status !== '전체' && t.status !== currentFilters.status) return false;
+    if (currentFilters.priority !== '전체' && t.priority !== currentFilters.priority) return false;
+    return true;
+  });
 
   let html = '';
   SECTIONS.forEach(sec => {
-    const secTasks = filtered.filter(t => t.section === sec.id);
+    const secTasks = sortTasks(filtered.filter(t => t.section === sec.id));
     if (!secTasks.length) return;
     const allTasks = tasks.filter(t => t.section === sec.id);
     const done = allTasks.filter(t => t.status === '완료').length;
@@ -858,18 +1510,26 @@ function renderTaskList() {
       </div>
       <table class="task-table">
         <thead><tr>
-          <th style="width:130px">분류</th>
+          <th style="width:110px">분류</th>
           <th>세부 업무 내용</th>
-          <th style="width:80px">상태</th>
-          <th style="width:160px">비고</th>
+          <th style="width:80px">우선</th>
+          <th style="width:130px">마감일</th>
+          <th style="width:78px">상태</th>
+          <th style="width:130px">비고</th>
           <th style="width:64px"></th>
         </tr></thead>
         <tbody>`;
 
     secTasks.forEach(t => {
-      html += `<tr>
+      const rowCls = `task-row${isUrgent(t) ? ' is-urgent' : ''}${isOverdue(t) ? ' is-overdue' : ''}`;
+      const asanaIcon = t.asanaUrl
+        ? `<a href="${escHtml(t.asanaUrl)}" target="_blank" class="asana-link" title="Asana에서 보기">A</a>`
+        : '';
+      html += `<tr class="${rowCls}">
         <td class="cat-cell" style="color:${sec.color}">${escHtml(t.cat)}</td>
-        <td class="task-cell">${escHtml(t.task)}</td>
+        <td class="task-cell">${escHtml(t.task)}${asanaIcon}</td>
+        <td><button class="prio-badge ${t.priority || '보통'}" onclick="cyclePriority(${t.id})" title="클릭하여 우선순위 변경">${t.priority || '보통'}</button></td>
+        <td>${formatDueCell(t)}</td>
         <td><button class="badge ${t.status}" onclick="cycleStatus(${t.id})" title="클릭하여 상태 변경">${t.status}</button></td>
         <td class="note-cell">${escHtml(t.note)}</td>
         <td><div class="action-btns">
@@ -881,14 +1541,14 @@ function renderTaskList() {
     html += `</tbody></table></div>`;
   });
 
-  el.innerHTML = html || `<div class="empty">${currentFilter === '전체' ? '등록된 업무가 없습니다. ＋ 업무 추가 버튼을 눌러 시작하세요.' : '해당 상태의 업무가 없습니다.'}</div>`;
+  el.innerHTML = html || `<div class="empty">${(currentFilters.status === '전체' && currentFilters.priority === '전체') ? '등록된 업무가 없습니다. ＋ 업무 추가 버튼을 눌러 시작하세요.' : '해당 조건의 업무가 없습니다.'}</div>`;
 }
 
 function renderReport() {
   const el = document.getElementById('reportList');
   let html = '';
   SECTIONS.forEach(sec => {
-    const secTasks = tasks.filter(t => t.section === sec.id);
+    const secTasks = sortTasks(tasks.filter(t => t.section === sec.id));
     if (!secTasks.length) return;
     html += `<div class="section-block">
       <div class="section-header">
@@ -898,16 +1558,20 @@ function renderReport() {
       </div>
       <table class="task-table">
         <thead><tr>
-          <th style="width:140px">분류</th>
+          <th style="width:120px">분류</th>
           <th>세부 업무 내용</th>
-          <th style="width:80px">상태</th>
-          <th style="width:160px">비고</th>
+          <th style="width:70px">우선</th>
+          <th style="width:110px">마감일</th>
+          <th style="width:78px">상태</th>
+          <th style="width:140px">비고</th>
         </tr></thead>
         <tbody>`;
     secTasks.forEach(t => {
       html += `<tr>
         <td class="cat-cell" style="color:${sec.color}">${escHtml(t.cat)}</td>
         <td class="task-cell">${escHtml(t.task)}</td>
+        <td><span class="prio-badge ${t.priority || '보통'}">${t.priority || '보통'}</span></td>
+        <td>${formatDueCell(t)}</td>
         <td><span class="badge ${t.status}">${t.status}</span></td>
         <td class="note-cell">${escHtml(t.note)}</td>
       </tr>`;
@@ -924,12 +1588,16 @@ function updatePeriod(val) {
   scheduleSave();
 }
 
-const STATUS_CYCLE = { '미완료':'진행중', '진행중':'완료', '완료':'미완료', '보류':'미완료' };
-
 function cycleStatus(id) {
   if (!getToken()) { showToast('읽기 전용 모드입니다. 우측 상단 뱃지를 클릭하여 토큰을 설정하세요.'); return; }
   const t = tasks.find(t => t.id === id);
   if (t) { t.status = STATUS_CYCLE[t.status] || '진행중'; render(); scheduleSave(); }
+}
+
+function cyclePriority(id) {
+  if (!getToken()) { showToast('읽기 전용 모드입니다.'); return; }
+  const t = tasks.find(t => t.id === id);
+  if (t) { t.priority = PRIO_CYCLE[t.priority || '보통'] || '보통'; render(); scheduleSave(); }
 }
 
 function deleteTask(id) {
@@ -940,10 +1608,10 @@ function deleteTask(id) {
   showToast('업무가 삭제되었습니다.');
 }
 
-function setFilter(f) {
-  currentFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(b => {
-    b.classList.toggle('active', b.textContent === f);
+function setFilter(type, value) {
+  currentFilters[type] = value;
+  document.querySelectorAll(`.filter-btn[data-filter="${type}"]`).forEach(b => {
+    b.classList.toggle('active', b.dataset.value === value);
   });
   renderTaskList();
 }
@@ -956,6 +1624,13 @@ function switchView(v) {
   });
 }
 
+function selectPriority(val) {
+  document.getElementById('fPriority').value = val;
+  document.querySelectorAll('#fPrioGroup .prio-option').forEach(b => {
+    b.classList.toggle('selected', b.dataset.val === val);
+  });
+}
+
 function openModal() {
   if (!getToken()) { showToast('읽기 전용 모드입니다. 우측 상단 뱃지를 클릭하여 토큰을 설정하세요.'); return; }
   document.getElementById('modalTitle').textContent = '업무 추가';
@@ -964,6 +1639,8 @@ function openModal() {
   document.getElementById('fCat').value = '';
   document.getElementById('fTask').value = '';
   document.getElementById('fStatus').value = '미완료';
+  document.getElementById('fDueDate').value = '';
+  selectPriority('보통');
   document.getElementById('fNote').value = '';
   document.getElementById('modalOverlay').classList.add('open');
   setTimeout(() => document.getElementById('fCat').focus(), 100);
@@ -979,6 +1656,8 @@ function openEdit(id) {
   document.getElementById('fCat').value = t.cat;
   document.getElementById('fTask').value = t.task;
   document.getElementById('fStatus').value = t.status;
+  document.getElementById('fDueDate').value = t.dueDate || '';
+  selectPriority(t.priority || '보통');
   document.getElementById('fNote').value = t.note;
   document.getElementById('modalOverlay').classList.add('open');
 }
@@ -990,11 +1669,13 @@ function closeModal() {
 function saveTask() {
   const editId = document.getElementById('editId').value;
   const data = {
-    section: document.getElementById('fSection').value,
-    cat:     document.getElementById('fCat').value.trim(),
-    task:    document.getElementById('fTask').value.trim(),
-    status:  document.getElementById('fStatus').value,
-    note:    document.getElementById('fNote').value.trim(),
+    section:  document.getElementById('fSection').value,
+    cat:      document.getElementById('fCat').value.trim(),
+    task:     document.getElementById('fTask').value.trim(),
+    status:   document.getElementById('fStatus').value,
+    dueDate:  document.getElementById('fDueDate').value || '',
+    priority: document.getElementById('fPriority').value || '보통',
+    note:     document.getElementById('fNote').value.trim(),
   };
   if (!data.task) { alert('세부 업무 내용을 입력해주세요.'); return; }
   if (editId) {
@@ -1002,14 +1683,14 @@ function saveTask() {
     if (t) Object.assign(t, data);
     showToast('업무가 수정되었습니다.');
   } else {
-    tasks.push({ id: nextId++, ...data });
+    tasks.push({ id: nextId++, asanaGid: '', asanaUrl: '', ...data });
     showToast('업무가 추가되었습니다.');
   }
   closeModal(); render(); scheduleSave();
 }
 
 function exportData() {
-  const payload = { version: 2, period: reportPeriod, exportedAt: new Date().toISOString(), tasks };
+  const payload = { version: 3, period: reportPeriod, exportedAt: new Date().toISOString(), tasks };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1035,7 +1716,7 @@ function importData(e) {
       const importedTasks = parsed.tasks || parsed;
       if (!Array.isArray(importedTasks)) throw new Error('Invalid format');
       if (!confirm(`${importedTasks.length}개 항목을 불러올까요? 현재 GitHub 데이터가 대체됩니다.`)) return;
-      tasks = importedTasks;
+      tasks = importedTasks.map(migrateTask);
       if (parsed.period) reportPeriod = parsed.period;
       nextId = tasks.length ? Math.max(...tasks.map(t => t.id || 0), 99) + 1 : 100;
       render(); scheduleSave();
@@ -1053,8 +1734,24 @@ document.getElementById('modalOverlay').addEventListener('click', function(e) {
 document.getElementById('tokenModalOverlay').addEventListener('click', function(e) {
   if (e.target === this) closeTokenModal();
 });
+document.getElementById('asanaTokenModalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeAsanaTokenModal();
+});
+document.getElementById('asanaImportModalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeAsanaImportModal();
+});
+document.getElementById('asanaWorkspaceSelect').addEventListener('change', function() {
+  localStorage.setItem(ASANA_WS_KEY, this.value);
+  asanaSelectedWs = this.value;
+});
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeModal(); closeTokenModal(); }
+  if (e.key === 'Escape') {
+    closeModal(); closeTokenModal();
+    closeAsanaTokenModal(); closeAsanaImportModal();
+  }
+});
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && getAsanaToken()) checkAsanaNew();
 });
 
 window.addEventListener('beforeunload', () => {
@@ -1064,6 +1761,11 @@ window.addEventListener('beforeunload', () => {
 loadFromCache();
 render();
 loadFromGitHub().then(ok => { if (ok) render(); });
+
+if (getAsanaToken()) {
+  startAsanaPolling();
+  setTimeout(checkAsanaNew, 3000);
+}
 </script>
 </body>
 </html>
