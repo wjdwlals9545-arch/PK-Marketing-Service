@@ -313,6 +313,22 @@
     display: flex; align-items: center; gap: 10px;
     margin-bottom: 12px; padding-bottom: 10px;
     border-bottom: 2px solid var(--slate-200);
+    cursor: pointer;
+    user-select: none;
+    transition: border-color 0.15s;
+  }
+  .section-header:hover { border-bottom-color: var(--indigo-500); }
+  .section-toggle {
+    width: 22px; height: 22px; border-radius: 5px;
+    border: 1px solid var(--slate-200);
+    background: var(--white); color: var(--slate-500);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; cursor: pointer; flex-shrink: 0;
+    transition: all 0.15s;
+    font-family: 'DM Mono', monospace; font-weight: 700;
+  }
+  .section-header:hover .section-toggle {
+    background: var(--indigo-50); color: var(--indigo-700); border-color: var(--indigo-500);
   }
   .section-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
   .section-name { font-size: 15px; font-weight: 700; color: var(--slate-800); }
@@ -322,6 +338,9 @@
     color: var(--slate-500); font-weight: 600;
     background: var(--slate-100); padding: 3px 10px; border-radius: 10px;
   }
+  .section-body { transition: max-height 0.25s ease; }
+  .section-block.collapsed .section-body { display: none; }
+  .section-block.collapsed .section-header { border-bottom-color: var(--slate-100); margin-bottom: 0; }
 
   .task-table {
     width: 100%; border-collapse: collapse;
@@ -642,7 +661,7 @@
 <nav>
   <div class="nav-brand">
     <div class="nav-logo">P</div>
-    <div class="nav-title">PROMEGA KOREA — 주간 업무 보고</div>
+    <div class="nav-title">PROMEGA KOREA — Weekly Report</div>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="switchView('dashboard')">
@@ -924,6 +943,8 @@ const LOCAL_CACHE_KEY = 'pk_tasks_cache';
 const ASANA_TOKEN_KEY = 'pk_asana_token';
 const ASANA_WS_KEY = 'pk_asana_workspace';
 const ASANA_SEEN_KEY = 'pk_asana_seen_gids';
+const COLLAPSED_KEY = 'pk_collapsed_sections';
+const DEFAULT_COLLAPSED = ['내부 미팅'];
 const ASANA_API = 'https://app.asana.com/api/1.0';
 const ASANA_POLL_MS = 5 * 60 * 1000;
 
@@ -973,6 +994,24 @@ function getAsanaSeenGids() {
 }
 function setAsanaSeenGids(arr) {
   try { localStorage.setItem(ASANA_SEEN_KEY, JSON.stringify(arr)); } catch(e) {}
+}
+
+function getCollapsedSections() {
+  try {
+    const raw = localStorage.getItem(COLLAPSED_KEY);
+    if (raw === null) return [...DEFAULT_COLLAPSED];
+    return JSON.parse(raw);
+  } catch(e) { return [...DEFAULT_COLLAPSED]; }
+}
+function setCollapsedSections(arr) {
+  try { localStorage.setItem(COLLAPSED_KEY, JSON.stringify(arr)); } catch(e) {}
+}
+function toggleSection(secId) {
+  const cur = getCollapsedSections();
+  const idx = cur.indexOf(secId);
+  if (idx >= 0) cur.splice(idx, 1); else cur.push(secId);
+  setCollapsedSections(cur);
+  renderTaskList();
 }
 
 function escHtml(s) {
@@ -1570,19 +1609,23 @@ function renderTaskList() {
   });
 
   let html = '';
+  const collapsed = getCollapsedSections();
   SECTIONS.forEach(sec => {
     const secTasks = sortTasks(filtered.filter(t => t.section === sec.id));
     if (!secTasks.length) return;
     const allTasks = tasks.filter(t => t.section === sec.id);
     const done = allTasks.filter(t => t.status === '완료').length;
+    const isCollapsed = collapsed.includes(sec.id);
 
-    html += `<div class="section-block">
-      <div class="section-header">
+    html += `<div class="section-block${isCollapsed ? ' collapsed' : ''}">
+      <div class="section-header" onclick="toggleSection('${sec.id.replace(/'/g,"\\'")}')">
+        <button class="section-toggle" title="${isCollapsed ? '펼치기' : '접기'}" onclick="event.stopPropagation(); toggleSection('${sec.id.replace(/'/g,"\\'")}')">${isCollapsed ? '▸' : '▾'}</button>
         <div class="section-dot" style="background:${sec.color}"></div>
         <div class="section-name">${sec.name}</div>
         ${sec.sub ? `<div class="section-sub">${sec.sub}</div>` : ''}
         <div class="section-count">${done}/${allTasks.length} 완료</div>
       </div>
+      <div class="section-body">
       <table class="task-table">
         <thead><tr>
           <th style="width:110px">분류</th>
@@ -1613,7 +1656,7 @@ function renderTaskList() {
         </div></td>
       </tr>`;
     });
-    html += `</tbody></table></div>`;
+    html += `</tbody></table></div></div>`;
   });
 
   el.innerHTML = html || `<div class="empty">${(currentFilters.status === '전체' && currentFilters.priority === '전체') ? '등록된 업무가 없습니다. ＋ 업무 추가 버튼을 눌러 시작하세요.' : '해당 조건의 업무가 없습니다.'}</div>`;
