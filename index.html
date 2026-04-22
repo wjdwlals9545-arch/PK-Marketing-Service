@@ -621,10 +621,20 @@
     transform: translateY(10px);
     transition: all 0.3s ease;
     pointer-events: none;
-    max-width: 360px;
+    max-width: 420px;
     box-shadow: 0 8px 24px rgba(15,23,42,0.15);
+    display: flex; align-items: center; gap: 12px;
   }
-  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .toast-msg { flex: 1; }
+  .toast-undo {
+    background: var(--indigo-600); color: #fff;
+    border: none; border-radius: 6px;
+    padding: 5px 12px; font-size: 12px; font-weight: 600;
+    cursor: pointer; white-space: nowrap;
+    transition: background 0.15s;
+  }
+  .toast-undo:hover { background: var(--indigo-700); }
 
   /* ====== TO-DO LIST ====== */
   .todo-quickadd {
@@ -1352,7 +1362,7 @@
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast"><span class="toast-msg" id="toastMsg"></span><button class="toast-undo" id="toastUndo" style="display:none" onclick="runToastUndo()">되돌리기</button></div>
 
 <script>
 const GH_OWNER = 'wjdwlals9545-arch';
@@ -1461,12 +1471,37 @@ function escHtml(s) {
 }
 
 let toastTimer;
-function showToast(msg) {
+let pendingUndo = null;
+function showToast(msg, opts) {
   const el = document.getElementById('toast');
-  el.textContent = msg;
+  const msgEl = document.getElementById('toastMsg');
+  const undoBtn = document.getElementById('toastUndo');
+  msgEl.textContent = msg;
+  const duration = (opts && opts.duration) || 3000;
+  if (opts && typeof opts.onUndo === 'function') {
+    pendingUndo = opts.onUndo;
+    undoBtn.style.display = '';
+  } else {
+    pendingUndo = null;
+    undoBtn.style.display = 'none';
+  }
   el.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+  toastTimer = setTimeout(() => {
+    el.classList.remove('show');
+    pendingUndo = null;
+    undoBtn.style.display = 'none';
+  }, duration);
+}
+function runToastUndo() {
+  if (typeof pendingUndo === 'function') {
+    const fn = pendingUndo;
+    pendingUndo = null;
+    fn();
+  }
+  document.getElementById('toast').classList.remove('show');
+  document.getElementById('toastUndo').style.display = 'none';
+  clearTimeout(toastTimer);
 }
 
 function todayStr() {
@@ -2185,13 +2220,33 @@ function updatePeriod(val) {
 function cycleStatus(id) {
   if (!getToken()) { showToast('읽기 전용 모드입니다. 우측 상단 뱃지를 클릭하여 토큰을 설정하세요.'); return; }
   const t = tasks.find(t => t.id === id);
-  if (t) { t.status = STATUS_CYCLE[t.status] || '진행중'; render(); scheduleSave(); }
+  if (!t) return;
+  const prev = t.status;
+  t.status = STATUS_CYCLE[prev] || '진행중';
+  render(); scheduleSave();
+  showToast(`상태: ${prev} → ${t.status}`, {
+    duration: 6000,
+    onUndo: () => {
+      const cur = tasks.find(x => x.id === id);
+      if (cur) { cur.status = prev; render(); scheduleSave(); showToast('되돌렸습니다.'); }
+    }
+  });
 }
 
 function cyclePriority(id) {
   if (!getToken()) { showToast('읽기 전용 모드입니다.'); return; }
   const t = tasks.find(t => t.id === id);
-  if (t) { t.priority = PRIO_CYCLE[t.priority || '보통'] || '보통'; render(); scheduleSave(); }
+  if (!t) return;
+  const prev = t.priority || '보통';
+  t.priority = PRIO_CYCLE[prev] || '보통';
+  render(); scheduleSave();
+  showToast(`우선순위: ${prev} → ${t.priority}`, {
+    duration: 6000,
+    onUndo: () => {
+      const cur = tasks.find(x => x.id === id);
+      if (cur) { cur.priority = prev; render(); scheduleSave(); showToast('되돌렸습니다.'); }
+    }
+  });
 }
 
 function deleteTask(id) {
