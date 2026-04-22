@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "period": "2026.04.13 — 04.17",
   "tasks": [
     {
@@ -259,7 +259,7 @@
       "section": "연구자 플라이어",
       "cat": "플라이어 제작",
       "task": "컨펌 전 최종 후보 2종 완성 — 통계바 색상 버전 각 1종 (Sol Yellow / Spirit Purple)",
-      "status": "진행중",
+      "status": "완료",
       "note": "컨펌 대기",
       "dueDate": "",
       "priority": "보통",
@@ -487,7 +487,7 @@
       "section": "연구자 플라이어",
       "cat": "Asana",
       "task": "Flyer 디자인 리뷰 ",
-      "status": "미완료",
+      "status": "완료",
       "note": "",
       "dueDate": "2026-04-20",
       "priority": "보통",
@@ -531,5 +531,6 @@
       "asanaUrl": "https://app.asana.com/1/8939068921658/task/1213009179545779"
     }
   ],
-  "updatedAt": "2026-04-22T01:53:35.938Z"
+  "todoList": [],
+  "updatedAt": "2026-04-22T06:31:42.997Z"
 }
