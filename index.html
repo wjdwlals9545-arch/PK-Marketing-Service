@@ -405,13 +405,20 @@
   .prio-badge.낮음 { background: var(--low-bg); color: var(--low-txt); border-color: var(--low-border); }
 
   .asana-link {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 22px; height: 22px; border-radius: 6px;
+    display: inline-flex; align-items: center; gap: 4px;
+    height: 20px; padding: 0 8px; border-radius: 10px;
     background: rgba(244, 84, 97, 0.12); color: #E11D48;
-    text-decoration: none; font-size: 11px; font-weight: 700;
-    margin-left: 6px; transition: all 0.15s;
+    text-decoration: none; font-size: 10.5px; font-weight: 700;
+    letter-spacing: 0.02em;
+    margin-left: 8px; transition: all 0.15s;
+    border: 1px solid rgba(244, 84, 97, 0.25);
+    vertical-align: middle;
   }
-  .asana-link:hover { background: rgba(244, 84, 97, 0.25); transform: scale(1.1); }
+  .asana-link:hover { background: rgba(244, 84, 97, 0.22); border-color: rgba(244, 84, 97, 0.4); }
+  .asana-link::before {
+    content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+    background: #E11D48;
+  }
 
   .action-btns { display: flex; gap: 4px; }
   .act-btn {
@@ -2105,8 +2112,8 @@ function renderTaskList() {
     secTasks.forEach(t => {
       const rowCls = `task-row${isUrgent(t) ? ' is-urgent' : ''}${isOverdue(t) ? ' is-overdue' : ''}`;
       const asanaIcon = t.asanaUrl
-        ? `<a href="${escHtml(t.asanaUrl)}" target="_blank" class="asana-link" title="Asana에서 보기">A</a>`
-        : '';
+        ? `<a href="${escHtml(t.asanaUrl)}" target="_blank" class="asana-link" title="Asana에서 보기">아사나</a>`
+        : (t.asanaGid ? `<span class="asana-link" title="Asana에서 가져온 업무">아사나</span>` : '');
       html += `<tr class="${rowCls}">
         <td class="cat-cell" style="color:${sec.color}">${escHtml(t.cat)}</td>
         <td class="task-cell">${escHtml(t.task)}${asanaIcon}</td>
@@ -2149,9 +2156,14 @@ function renderReport() {
         </tr></thead>
         <tbody>`;
     secTasks.forEach(t => {
+      const asanaTag = t.asanaGid
+        ? (t.asanaUrl
+            ? `<a href="${escHtml(t.asanaUrl)}" target="_blank" class="asana-link" title="Asana에서 보기">아사나</a>`
+            : `<span class="asana-link" title="Asana에서 가져온 업무">아사나</span>`)
+        : '';
       html += `<tr>
         <td class="cat-cell" style="color:${sec.color}">${escHtml(t.cat)}</td>
-        <td class="task-cell">${escHtml(t.task)}</td>
+        <td class="task-cell">${escHtml(t.task)}${asanaTag}</td>
         <td><span class="prio-badge ${t.priority || '보통'}">${t.priority || '보통'}</span></td>
         <td>${formatDueCell(t)}</td>
         <td><span class="badge ${t.status}">${t.status}</span></td>
