@@ -29,7 +29,6 @@
     min-height: 100vh;
   }
 
-  /* ── TOP NAV ── */
   nav {
     background: var(--deep-galaxy);
     border-bottom: 3px solid var(--sol-yellow);
@@ -52,7 +51,6 @@
     font-size: 13px; font-weight: 900; color: var(--deep-galaxy);
   }
   .nav-title { font-size: 14px; font-weight: 700; color: var(--white); letter-spacing: 0.05em; }
-  .nav-meta { font-size: 12px; color: #7A9CC6; font-family: 'DM Mono', monospace; flex-shrink: 0; }
   .nav-tabs { display: flex; gap: 4px; flex-shrink: 0; }
   .nav-tab {
     padding: 6px 16px; border-radius: 6px; border: none; cursor: pointer;
@@ -62,8 +60,7 @@
   .nav-tab.active { background: var(--sol-yellow); color: var(--deep-galaxy); }
   .nav-tab:hover:not(.active) { background: rgba(255,255,255,0.08); color: var(--white); }
 
-  /* ── NAV ACTIONS ── */
-  .nav-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .nav-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
   .nav-action-btn {
     padding: 5px 12px; border-radius: 6px;
     border: 1px solid rgba(255,255,255,0.15);
@@ -74,10 +71,27 @@
   .nav-action-btn:hover { background: rgba(255,255,255,0.1); color: var(--white); }
   .nav-action-btn.import-btn:hover { border-color: var(--clear-skies); color: var(--clear-skies); }
 
-  /* ── MAIN ── */
+  .sync-status {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    padding: 4px 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.15);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    user-select: none;
+  }
+  .sync-status:hover { background: rgba(255,255,255,0.08); }
+  .sync-loading { color: #7A9CC6; }
+  .sync-synced  { color: #4CAF50; border-color: rgba(76,175,80,0.3); }
+  .sync-syncing { color: var(--sol-yellow); border-color: rgba(253,184,19,0.3); }
+  .sync-offline { color: #FF9800; border-color: rgba(255,152,0,0.3); }
+  .sync-readonly { color: #7A9CC6; border-color: rgba(122,156,198,0.3); }
+  .sync-error   { color: #EF5350; border-color: rgba(239,83,80,0.3); }
+
   main { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
 
-  /* ── PAGE HEADER ── */
   .page-header { margin-bottom: 32px; }
   .report-period {
     font-family: 'DM Mono', monospace; font-size: 12px;
@@ -87,7 +101,6 @@
   .report-title { font-size: 28px; font-weight: 900; color: var(--white); margin-bottom: 4px; }
   .report-sub { font-size: 13px; color: #7A9CC6; }
 
-  /* Period editor */
   .period-editor {
     display: inline-flex; align-items: center; gap: 8px;
     background: rgba(255,255,255,0.05);
@@ -102,7 +115,6 @@
   }
   .period-input::placeholder { color: #4A6A8A; }
 
-  /* ── SUMMARY CARDS ── */
   .summary-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -146,7 +158,6 @@
   .todo .summary-bar-fill { background: #EF5350; }
   .hold .summary-bar-fill { background: #FF9800; }
 
-  /* ── SECTION PROGRESS ── */
   .section-progress {
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.08);
@@ -172,7 +183,6 @@
     color: #7A9CC6; width: 36px; text-align: right; flex-shrink: 0;
   }
 
-  /* ── FILTER BAR ── */
   .filter-bar {
     display: flex; align-items: center; gap: 10px;
     margin-bottom: 24px; flex-wrap: wrap;
@@ -199,7 +209,6 @@
   }
   .add-btn:hover { background: #e5a810; transform: translateY(-1px); }
 
-  /* ── SECTION BLOCK ── */
   .section-block { margin-bottom: 28px; }
   .section-header {
     display: flex; align-items: center; gap: 10px;
@@ -211,7 +220,6 @@
   .section-sub { font-size: 12px; color: #7A9CC6; }
   .section-count { margin-left: auto; font-size: 11px; font-family: 'DM Mono', monospace; color: #7A9CC6; }
 
-  /* ── TASK TABLE ── */
   .task-table {
     width: 100%; border-collapse: collapse;
     background: rgba(255,255,255,0.03);
@@ -231,7 +239,6 @@
   .task-cell { max-width: 420px; line-height: 1.5; }
   .note-cell { font-size: 11px; color: #7A9CC6; max-width: 160px; }
 
-  /* ── STATUS BADGE ── */
   .badge {
     display: inline-flex; align-items: center; gap: 5px;
     padding: 3px 10px; border-radius: 20px;
@@ -245,7 +252,6 @@
   .badge.미완료 { background: var(--todo-bg); color: var(--todo-txt); }
   .badge.보류   { background: var(--hold-bg); color: var(--hold-txt); }
 
-  /* ── ACTION BTNS ── */
   .action-btns { display: flex; gap: 4px; }
   .act-btn {
     width: 26px; height: 26px; border-radius: 6px;
@@ -257,7 +263,6 @@
   .act-btn:hover { background: rgba(255,255,255,0.1); color: var(--white); }
   .act-btn.del:hover { background: rgba(239,83,80,0.2); color: #EF5350; border-color: #EF5350; }
 
-  /* ── MODAL ── */
   .modal-overlay {
     display: none; position: fixed; inset: 0;
     background: rgba(0,0,0,0.7); z-index: 200;
@@ -307,14 +312,21 @@
   }
   .btn-save:hover { background: #e5a810; }
 
-  /* ── EMPTY STATE ── */
+  .help-text {
+    font-size: 12px; color: #7A9CC6; line-height: 1.6; margin-top: 6px;
+  }
+  .help-text a { color: var(--sol-yellow); text-decoration: none; }
+  .help-text a:hover { text-decoration: underline; }
+  .help-text code {
+    background: rgba(0,0,0,0.3); padding: 1px 6px; border-radius: 4px;
+    font-family: 'DM Mono', monospace; font-size: 11px; color: #B0C4DE;
+  }
+
   .empty { text-align: center; padding: 40px; color: #7A9CC6; font-size: 13px; }
 
-  /* ── VIEW TOGGLE ── */
   .view-content { display: none; }
   .view-content.active { display: block; }
 
-  /* ── REPORT VIEW ── */
   .report-info {
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.08);
@@ -337,7 +349,6 @@
   }
   .print-btn:hover { background: rgba(255,255,255,0.15); color: var(--white); }
 
-  /* ── TOAST ── */
   .toast {
     position: fixed; bottom: 24px; right: 24px;
     background: #1A2E4A; border: 1px solid rgba(255,255,255,0.15);
@@ -348,31 +359,13 @@
     transform: translateY(10px);
     transition: all 0.3s ease;
     pointer-events: none;
+    max-width: 360px;
   }
   .toast.show { opacity: 1; transform: translateY(0); }
 
-  /* ── RESET CONFIRM ── */
-  .danger-zone {
-    margin-top: 32px; padding: 16px 20px;
-    border: 1px solid rgba(239,83,80,0.2);
-    border-radius: 10px; display: flex;
-    align-items: center; justify-content: space-between;
-    gap: 16px;
-  }
-  .danger-label { font-size: 12px; color: #EF9090; }
-  .danger-btn {
-    padding: 6px 16px; border-radius: 6px;
-    border: 1px solid rgba(239,83,80,0.4);
-    background: transparent; color: #EF5350;
-    font-size: 12px; font-family: 'Noto Sans KR', sans-serif;
-    cursor: pointer; transition: all 0.2s; white-space: nowrap;
-  }
-  .danger-btn:hover { background: rgba(239,83,80,0.15); }
-
-  /* ── PRINT STYLES ── */
   @media print {
     nav, .filter-bar, .action-btns, .add-btn, .print-btn,
-    .period-editor, .danger-zone, #view-dashboard { display: none !important; }
+    .period-editor, #view-dashboard { display: none !important; }
     body { background: #fff; color: #000; }
     main { padding: 0; }
     .view-content { display: block !important; }
@@ -395,8 +388,7 @@
   }
   @media (max-width: 768px) {
     .summary-grid { grid-template-columns: repeat(2, 1fr); }
-    nav { padding: 0 16px; flex-wrap: wrap; height: auto; padding: 10px 16px; gap: 8px; }
-    .nav-meta { display: none; }
+    nav { padding: 10px 16px; flex-wrap: wrap; height: auto; gap: 8px; }
     main { padding: 20px 16px; }
     .nav-actions { flex-wrap: wrap; }
     .nav-action-btn { font-size: 10px; padding: 4px 8px; }
@@ -415,16 +407,15 @@
     <button class="nav-tab" onclick="switchView('report')">보고서</button>
   </div>
   <div class="nav-actions">
-    <button class="nav-action-btn" onclick="exportData()" title="현재 업무 데이터를 JSON 파일로 저장">↓ 내보내기</button>
-    <button class="nav-action-btn import-btn" onclick="triggerImport()" title="JSON 파일에서 업무 데이터 불러오기">↑ 불러오기</button>
+    <span class="sync-status sync-loading" id="syncStatus" onclick="openTokenModal()" title="클릭하여 GitHub 토큰 설정">⟳ 불러오는 중...</span>
+    <button class="nav-action-btn" onclick="exportData()" title="JSON 백업 파일로 저장">↓ 내보내기</button>
+    <button class="nav-action-btn import-btn" onclick="triggerImport()" title="JSON 백업 파일에서 불러오기">↑ 불러오기</button>
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
   </div>
-  <div class="nav-meta" id="navMeta">불러오는 중...</div>
 </nav>
 
 <main>
 
-  <!-- ── DASHBOARD VIEW ── -->
   <div class="view-content active" id="view-dashboard">
 
     <div class="page-header">
@@ -437,7 +428,6 @@
       </div>
     </div>
 
-    <!-- Summary Cards -->
     <div class="summary-grid">
       <div class="summary-card total">
         <div class="summary-label">전체 업무</div>
@@ -466,13 +456,11 @@
       </div>
     </div>
 
-    <!-- Section Progress -->
     <div class="section-progress">
       <div class="section-progress-title">섹션별 진행률</div>
       <div id="sectionProgress"></div>
     </div>
 
-    <!-- Filter + Add -->
     <div class="filter-bar">
       <span class="filter-label">필터</span>
       <button class="filter-btn active" onclick="setFilter('전체')">전체</button>
@@ -483,18 +471,10 @@
       <button class="add-btn" onclick="openModal()">＋ 업무 추가</button>
     </div>
 
-    <!-- Task List -->
     <div id="taskList"></div>
-
-    <!-- Danger Zone -->
-    <div class="danger-zone">
-      <span class="danger-label">⚠ 전체 데이터 초기화 — 기본 샘플 데이터로 되돌립니다.</span>
-      <button class="danger-btn" onclick="resetData()">초기화</button>
-    </div>
 
   </div>
 
-  <!-- ── REPORT VIEW ── -->
   <div class="view-content" id="view-report">
     <div class="page-header">
       <div class="report-period">보고서 뷰</div>
@@ -511,7 +491,6 @@
 
 </main>
 
-<!-- ── MODAL ── -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <div class="modal-title" id="modalTitle">업무 추가</div>
@@ -559,11 +538,43 @@
   </div>
 </div>
 
-<!-- ── TOAST ── -->
+<div class="modal-overlay" id="tokenModalOverlay">
+  <div class="modal">
+    <div class="modal-title">GitHub 동기화 설정</div>
+    <div class="form-group">
+      <label class="form-label">Personal Access Token (PAT)</label>
+      <input class="form-input" id="tokenInput" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+      <div class="help-text">
+        <strong>토큰 발급 방법:</strong><br>
+        1. <a href="https://github.com/settings/tokens/new?description=PK%20Marketing%20Dashboard&scopes=repo" target="_blank">여기를 클릭</a>하여 GitHub 토큰 생성 페이지로 이동<br>
+        2. <strong>repo</strong> 권한 체크 확인 → <strong>Generate token</strong> 클릭<br>
+        3. 생성된 토큰(<code>ghp_...</code>)을 복사하여 위 칸에 붙여넣기<br><br>
+        ※ 토큰은 이 브라우저에만 저장되며 외부로 전송되지 않습니다.<br>
+        ※ 토큰 없이도 <strong>읽기</strong>는 가능합니다 (수정/저장 시 필요).
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">현재 상태</label>
+      <div class="help-text" id="tokenStatusText">확인 중...</div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="clearToken()" style="color:#EF5350; border-color:rgba(239,83,80,0.3)">토큰 삭제</button>
+      <button class="btn-cancel" onclick="closeTokenModal()">취소</button>
+      <button class="btn-save" onclick="saveToken()">저장</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-// ── SECTION CONFIG ──────────────────────────────────────────────────────
+const GH_OWNER = 'wjdwlals9545-arch';
+const GH_REPO = 'PK-Marketing-Service';
+const GH_DATA_PATH = 'public/data/tasks.json';
+const GH_API = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_DATA_PATH}`;
+const TOKEN_KEY = 'pk_gh_token';
+const LOCAL_CACHE_KEY = 'pk_tasks_cache';
+
 const SECTIONS = [
   { id: '대한약학회',          name: '대한약학회 (춘계)',                    sub: '4월 23~24일 • 청주 OSCO',      color: '#1565C0' },
   { id: '대한기초의학 학회',   name: '대한기초의학 학회',                    sub: '4월 29~30일',                   color: '#6A1B9A' },
@@ -577,80 +588,210 @@ const SECTIONS = [
   { id: 'IT/시스템',           name: 'IT / 시스템',                          sub: '',                              color: '#4527A0' },
 ];
 
-// ── DEFAULT DATA ─────────────────────────────────────────────────────────
-const DEFAULT_TASKS = [
-  { id:1,  section:'대한약학회',         cat:'이벤트 기획·운영', task:'박스 기획: 불투명 박스 + 프로메가 디자인, 상단 손구멍 구조 결정', status:'완료',   note:'' },
-  { id:2,  section:'대한약학회',         cat:'물품 준비',        task:'대한약학회·기초의학 경품 박스 물품 팩킹 리스트 작성',             status:'완료',   note:'' },
-  { id:3,  section:'대한약학회',         cat:'인쇄 발주',        task:'경품 카드 4종 + 폼보드 인쇄 발주',                                status:'완료',   note:'4/17 납품 완료, 실물 확인 필요' },
-  { id:4,  section:'대한약학회',         cat:'선물 준비',        task:'수량 확정 품목 준비 중: 볼펜/노트(각 100) · 에코백(30) · 루미인형(30) · 노트북파우치(2) · 텀블러(30) · 고래키링(5) · 가죽필통(3)', status:'진행중', note:'4월 21일 최종 컨펌 이후 패킹 준비 예정' },
-  { id:5,  section:'대한기초의학 학회',  cat:'물품 준비',        task:'기초의학 학회 경품 물품 팩킹 리스트 작성',                        status:'완료',   note:'' },
-  { id:6,  section:'대한기초의학 학회',  cat:'인쇄 발주',        task:'경품 카드 4종 + 폼보드 인쇄 발주',                                status:'완료',   note:'4/17 납품 완료, 실물 확인 필요' },
-  { id:7,  section:'대한기초의학 학회',  cat:'선물 준비',        task:'수량 확정 품목 준비 중: 볼펜/노트(각 100) · 에코백(30) · 노트북스티커(30) · 루미인형(30) · 맥스웰레고(2) · 텀블러(30) · 고래키링(5) · 가죽필통(3)', status:'진행중', note:'4월 21일 최종 컨펌 이후 패킹 준비 예정' },
-  { id:8,  section:'Sitecore CMS',      cat:'Connections',      task:'Drug Discovery 게시글 추가 (Tivantinib 페이지)',                   status:'완료',   note:'Drug Discovery 카테고리, 추가 완료' },
-  { id:9,  section:'Sitecore CMS',      cat:'Connections',      task:'Tivantinib 아티클 페이지 가독성 확보 (문구·여백·볼드체)',          status:'완료',   note:'가독성을 위한 내용 수정 완료' },
-  { id:10, section:'Sitecore CMS',      cat:'타일 URL 수정',    task:'BRETSA Target Engagement 페이지 Blog 타일 URL 수정 요청',          status:'진행중', note:'글로벌 페이지 권한 부족 → 본사 에스컬레이션 (Sitecore 팀즈 게시판 요청 중)' },
-  { id:11, section:'Sitecore CMS',      cat:'웨비나',           task:'Global Webinar 타일 링크 URL 추가',                                status:'완료',   note:'' },
-  { id:12, section:'Sitecore CMS',      cat:'Sitecore 계정',    task:'Sitecore 개인 계정 발급 팔로업 이메일 발송 (INC-151341)',           status:'진행중', note:'4/16 Service Desk 재문의' },
-  { id:13, section:'Sitecore CMS',      cat:'Sitecore',         task:'RTM 전환 추적',                                                   status:'진행중', note:'' },
-  { id:14, section:'Sitecore CMS',      cat:'Sitecore',         task:'아티클 내 사이드바 배경색 제거',                                  status:'진행중', note:'' },
-  { id:15, section:'Sitecore CMS',      cat:'Sitecore',         task:'Sticky Banner 적용 (슬라이드1 - 3번)',                             status:'진행중', note:'금주 내 업데이트 예정' },
-  { id:16, section:'Sitecore CMS',      cat:'Sitecore',         task:'[3D Assay 리서치 리소스] 섹션 내 텍스트 정렬/여백 및 타일 문제 (슬라이드2 - 8번)', status:'진행중', note:'금주 내 업데이트 예정' },
-  { id:17, section:'Sitecore CMS',      cat:'Sitecore',         task:'Promotional Offers 페이지 웨비나 섹션 구분선 → 브랜딩 박스 형태 변환 (이수연 책임님 요청)', status:'진행중', note:'금주 수정 예정' },
-  { id:18, section:'Adobe Express / DAM', cat:'Adobe Express',  task:'Ryan Engel (본사) Adobe Express 워크스페이스 설정 요청 이메일 수신 및 회신 (4/16~17)', status:'완료', note:'' },
-  { id:19, section:'Adobe Express / DAM', cat:'Adobe Express',  task:'Promega Korea 워크스페이스 생성 확인',                            status:'완료',   note:'' },
-  { id:20, section:'Adobe Express / DAM', cat:'CC 설치',        task:'Adobe Creative Cloud 설치 이슈 티켓 (INC-151514) 처리 완료 — Service Desk 원격 지원', status:'완료', note:'4/15 티켓 완료 / 추후 노트북 변경 시 재설치 필요' },
-  { id:21, section:'Adobe Express / DAM', cat:'이수연 책임 공유', task:'PromeTech_Seminar_A4_1 Adobe Express 파일 — 이수연 책임 접근 요청 승인', status:'완료', note:'4/17' },
-  { id:22, section:'연구자 플라이어',   cat:'플라이어 제작',    task:'컨펌 전 최종 후보 2종 완성 — 통계바 색상 버전 각 1종 (Sol Yellow / Spirit Purple)', status:'진행중', note:'컨펌 대기' },
-  { id:23, section:'연구자 플라이어',   cat:'QR 코드',          task:'CTA 푸터 QR 코드 2종 삽입 완료 (신청 QR · 카카오톡 상담)',         status:'완료',   note:'' },
-  { id:24, section:'Maxwell CSC',       cat:'Application 검토', task:'Maxwell CSC Application List PDF p.3~4 브랜딩 검토',               status:'완료',   note:'' },
-  { id:25, section:'Maxwell CSC',       cat:'PDF 수정 요청',    task:'IVD 배지 색상 / 페이지 레이아웃 재구성 / 체크 아이콘 교체 등 벤더 수정 요청 사항 정리', status:'완료', note:'' },
-  { id:26, section:'대리점 교육',       cat:'대리점 교육',      task:'프로메가 제품 선택가이드 대리점 온라인 교육 참관 (이수연 책임 주관)', status:'완료',  note:'4/15 09:00~10:30 SEO-MAXWELL' },
-  { id:27, section:'내부 미팅',         cat:'Marketing Service MTG', task:'김미경 책임 주관 Marketing Service 미팅 (매주 수요일)',        status:'완료',   note:'4/14 09:00 SEO-GLO-ING' },
-  { id:28, section:'내부 미팅',         cat:'Sales Ops Intro.', task:'Sales Operation 부서 인트로 미팅 주관 (박선영·김미경 책임 참석)',   status:'완료',   note:'4/14 14:00 SEO-GLO-ING' },
-  { id:29, section:'내부 미팅',         cat:'MKT Science Intro.', task:'MKT Science 부서 인트로 미팅 주관 (권정은·김미경 책임 참석)',    status:'완료',   note:'4/14 15:00 SEO-GLO-ING' },
-  { id:30, section:'내부 미팅',         cat:'Merit Meeting',    task:'CY2026 Merit Increase 미팅 주관 (김광일 팀장 참석)',               status:'완료',   note:'4/15 15:00 SEO-GLO-ING' },
-  { id:31, section:'블로그/콘텐츠',     cat:'블로그 FAQ 포스터', task:'"Ask Promega" 네이버 블로그 FAQ 포스터 시리즈 제작 진행',          status:'진행중', note:'금주 내 컨펌 예정' },
-  { id:32, section:'IT/시스템',         cat:'디스크 용량',      task:'디스크 공간 부족 문제 (INC-151965) Service Desk 원격 접속 해결 — 60GB 확보', status:'완료', note:'4/16 해결 / 추후 추가 컴퓨터 확보 후 어도비 Apps 설치 예정' },
-];
+const DEFAULT_PERIOD = '2026.04.13 — 04.17';
 
-// ── STATE ────────────────────────────────────────────────────────────────
 let tasks = [];
-let reportPeriod = '2026.04.13 — 04.17';
+let reportPeriod = DEFAULT_PERIOD;
 let currentFilter = '전체';
 let nextId = 100;
+let syncSha = null;
+let syncTimer = null;
+let lastSyncAt = null;
 
-function loadData() {
+function getToken() {
+  try { return localStorage.getItem(TOKEN_KEY) || ''; } catch(e) { return ''; }
+}
+
+function escHtml(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+let toastTimer;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+function setSyncStatus(status, customText) {
+  const el = document.getElementById('syncStatus');
+  if (!el) return;
+  const map = {
+    loading:  { text: '⟳ 불러오는 중...', cls: 'sync-loading' },
+    synced:   { text: '☁ 동기화됨',       cls: 'sync-synced' },
+    syncing:  { text: '⟳ 동기화 중...',   cls: 'sync-syncing' },
+    offline:  { text: '⚠ 오프라인',        cls: 'sync-offline' },
+    readonly: { text: '👁 읽기 전용',      cls: 'sync-readonly' },
+    error:    { text: '✗ 오류',            cls: 'sync-error' },
+  };
+  const item = map[status] || map.loading;
+  el.textContent = customText || item.text;
+  el.className = 'sync-status ' + item.cls;
+}
+
+async function loadFromGitHub() {
+  setSyncStatus('loading');
+  const token = getToken();
   try {
-    const saved = localStorage.getItem('promega_tasks_v2');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      tasks = parsed.tasks || DEFAULT_TASKS;
-      reportPeriod = parsed.period || reportPeriod;
-      nextId = Math.max(...tasks.map(t => t.id), 99) + 1;
-    } else {
-      tasks = DEFAULT_TASKS;
-      nextId = 200;
-      saveData();
+    const headers = { Accept: 'application/vnd.github+json' };
+    if (token) headers.Authorization = `token ${token}`;
+    const resp = await fetch(GH_API + `?t=${Date.now()}`, { headers });
+    if (resp.status === 404) {
+      console.log('[Sync] tasks.json not found yet');
+      loadFromCache();
+      setSyncStatus(token ? 'synced' : 'readonly');
+      return false;
     }
-  } catch(e) {
-    tasks = DEFAULT_TASKS;
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const info = await resp.json();
+    syncSha = info.sha;
+    const decoded = decodeURIComponent(escape(atob(info.content.replace(/\n/g, ''))));
+    const parsed = JSON.parse(decoded);
+    tasks = Array.isArray(parsed.tasks) ? parsed.tasks : [];
+    reportPeriod = parsed.period || DEFAULT_PERIOD;
+    nextId = tasks.length ? Math.max(...tasks.map(t => t.id || 0), 99) + 1 : 100;
+    cacheLocally();
+    setSyncStatus(token ? 'synced' : 'readonly');
+    lastSyncAt = new Date();
+    return true;
+  } catch (err) {
+    console.error('[Sync] Load failed:', err);
+    const hadCache = loadFromCache();
+    setSyncStatus('offline', hadCache ? '⚠ 오프라인 (캐시)' : '⚠ 오프라인');
+    return false;
   }
 }
 
-function saveData() {
+async function saveToGitHub() {
+  const token = getToken();
+  if (!token) { setSyncStatus('readonly'); return; }
+  setSyncStatus('syncing');
+  const payload = {
+    version: 2,
+    period: reportPeriod,
+    tasks,
+    updatedAt: new Date().toISOString(),
+  };
+  const jsonStr = JSON.stringify(payload, null, 2);
+  const content = btoa(unescape(encodeURIComponent(jsonStr)));
   try {
-    localStorage.setItem('promega_tasks_v2', JSON.stringify({ tasks, period: reportPeriod }));
+    if (!syncSha) {
+      const getResp = await fetch(GH_API + `?t=${Date.now()}`, {
+        headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github+json' }
+      });
+      if (getResp.ok) { const info = await getResp.json(); syncSha = info.sha; }
+    }
+    const ts = new Date().toISOString().slice(0,16).replace('T',' ');
+    const body = {
+      message: `Sync dashboard state (${ts})`,
+      content,
+      ...(syncSha ? { sha: syncSha } : {}),
+    };
+    const resp = await fetch(GH_API, {
+      method: 'PUT',
+      headers: {
+        Authorization: `token ${token}`,
+        Accept: 'application/vnd.github+json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+    if (!resp.ok) {
+      const txt = await resp.text();
+      console.error('[Sync] Save failed:', resp.status, txt.slice(0,300));
+      if (resp.status === 409 || resp.status === 422) {
+        syncSha = null;
+        const reloaded = await loadFromGitHub();
+        if (reloaded) { render(); setTimeout(saveToGitHub, 500); return; }
+      }
+      if (resp.status === 401 || resp.status === 403) {
+        setSyncStatus('error', '✗ 토큰 오류');
+        showToast('GitHub 토큰이 유효하지 않습니다. 상태 뱃지를 클릭하여 재설정하세요.');
+        return;
+      }
+      setSyncStatus('error', `✗ ${resp.status}`);
+      return;
+    }
+    const info = await resp.json();
+    syncSha = info.content ? info.content.sha : syncSha;
+    lastSyncAt = new Date();
+    setSyncStatus('synced');
+  } catch (err) {
+    console.error('[Sync] Save error:', err);
+    setSyncStatus('offline');
+  }
+}
+
+function scheduleSave() {
+  cacheLocally();
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(() => { saveToGitHub(); }, 1500);
+}
+
+function cacheLocally() {
+  try {
+    localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify({
+      tasks, period: reportPeriod, cachedAt: new Date().toISOString()
+    }));
   } catch(e) {}
 }
 
-// ── RENDER ───────────────────────────────────────────────────────────────
+function loadFromCache() {
+  try {
+    const raw = localStorage.getItem(LOCAL_CACHE_KEY);
+    if (!raw) return false;
+    const parsed = JSON.parse(raw);
+    tasks = parsed.tasks || [];
+    reportPeriod = parsed.period || DEFAULT_PERIOD;
+    nextId = tasks.length ? Math.max(...tasks.map(t => t.id || 0), 99) + 1 : 100;
+    return true;
+  } catch(e) { return false; }
+}
+
+function openTokenModal() {
+  const current = getToken();
+  document.getElementById('tokenInput').value = current;
+  const statusEl = document.getElementById('tokenStatusText');
+  if (current) {
+    statusEl.innerHTML = `<strong style="color:#4CAF50;">✓ 토큰이 설정됨</strong> — GitHub 동기화 활성화${lastSyncAt ? '<br>마지막 동기화: ' + lastSyncAt.toLocaleString('ko-KR') : ''}`;
+  } else {
+    statusEl.innerHTML = `<strong style="color:#FF9800;">⚠ 토큰 미설정</strong> — 현재 읽기 전용 모드입니다.`;
+  }
+  document.getElementById('tokenModalOverlay').classList.add('open');
+}
+
+function closeTokenModal() {
+  document.getElementById('tokenModalOverlay').classList.remove('open');
+}
+
+function saveToken() {
+  const val = document.getElementById('tokenInput').value.trim();
+  if (!val) { alert('토큰을 입력해주세요. 삭제하시려면 "토큰 삭제" 버튼을 사용하세요.'); return; }
+  if (!/^(ghp_|github_pat_)/.test(val)) {
+    if (!confirm('토큰 형식이 일반적이지 않습니다 (ghp_ 또는 github_pat_ 으로 시작). 그래도 저장할까요?')) return;
+  }
+  localStorage.setItem(TOKEN_KEY, val);
+  closeTokenModal();
+  showToast('토큰 저장 완료. 동기화 중...');
+  syncSha = null;
+  loadFromGitHub().then(() => { render(); });
+}
+
+function clearToken() {
+  if (!confirm('토큰을 삭제하시겠습니까? 이후 수정/저장이 불가능해집니다.')) return;
+  localStorage.removeItem(TOKEN_KEY);
+  closeTokenModal();
+  setSyncStatus('readonly');
+  showToast('토큰이 삭제되었습니다.');
+}
+
 function render() {
   updateSummary();
   renderSectionProgress();
   renderTaskList();
   renderReport();
-  document.getElementById('navMeta').textContent =
-    `총 ${tasks.length}개 · 완료 ${tasks.filter(t=>t.status==='완료').length}개`;
   document.getElementById('dashPeriod').textContent = reportPeriod;
   document.getElementById('periodInput').value = reportPeriod;
 
@@ -683,7 +824,7 @@ function updateSummary() {
 
 function renderSectionProgress() {
   const el = document.getElementById('sectionProgress');
-  el.innerHTML = SECTIONS.map(sec => {
+  const html = SECTIONS.map(sec => {
     const secTasks = tasks.filter(t => t.section === sec.id);
     if (!secTasks.length) return '';
     const done = secTasks.filter(t => t.status === '완료').length;
@@ -694,6 +835,7 @@ function renderSectionProgress() {
       <div class="prog-pct">${pct}%</div>
     </div>`;
   }).join('');
+  el.innerHTML = html || '<div class="empty" style="padding:16px;">등록된 업무가 없습니다.</div>';
 }
 
 function renderTaskList() {
@@ -739,7 +881,7 @@ function renderTaskList() {
     html += `</tbody></table></div>`;
   });
 
-  el.innerHTML = html || `<div class="empty">해당 상태의 업무가 없습니다.</div>`;
+  el.innerHTML = html || `<div class="empty">${currentFilter === '전체' ? '등록된 업무가 없습니다. ＋ 업무 추가 버튼을 눌러 시작하세요.' : '해당 상태의 업무가 없습니다.'}</div>`;
 }
 
 function renderReport() {
@@ -772,29 +914,29 @@ function renderReport() {
     });
     html += `</tbody></table></div>`;
   });
-  el.innerHTML = html;
+  el.innerHTML = html || `<div class="empty">등록된 업무가 없습니다.</div>`;
 }
 
-// ── PERIOD ───────────────────────────────────────────────────────────────
 function updatePeriod(val) {
   reportPeriod = val;
   document.getElementById('dashPeriod').textContent = val || '—';
   document.getElementById('rptPeriodText').textContent = val || '—';
-  saveData();
+  scheduleSave();
 }
 
-// ── ACTIONS ──────────────────────────────────────────────────────────────
 const STATUS_CYCLE = { '미완료':'진행중', '진행중':'완료', '완료':'미완료', '보류':'미완료' };
 
 function cycleStatus(id) {
+  if (!getToken()) { showToast('읽기 전용 모드입니다. 우측 상단 뱃지를 클릭하여 토큰을 설정하세요.'); return; }
   const t = tasks.find(t => t.id === id);
-  if (t) { t.status = STATUS_CYCLE[t.status] || '진행중'; saveData(); render(); }
+  if (t) { t.status = STATUS_CYCLE[t.status] || '진행중'; render(); scheduleSave(); }
 }
 
 function deleteTask(id) {
+  if (!getToken()) { showToast('읽기 전용 모드입니다.'); return; }
   if (!confirm('이 업무를 삭제할까요?')) return;
   tasks = tasks.filter(t => t.id !== id);
-  saveData(); render();
+  render(); scheduleSave();
   showToast('업무가 삭제되었습니다.');
 }
 
@@ -814,16 +956,8 @@ function switchView(v) {
   });
 }
 
-function resetData() {
-  if (!confirm('모든 데이터를 초기화하고 샘플 데이터로 되돌릴까요?\n이 작업은 되돌릴 수 없습니다.')) return;
-  tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
-  nextId = 200;
-  saveData(); render();
-  showToast('초기화 완료.');
-}
-
-// ── MODAL ────────────────────────────────────────────────────────────────
 function openModal() {
+  if (!getToken()) { showToast('읽기 전용 모드입니다. 우측 상단 뱃지를 클릭하여 토큰을 설정하세요.'); return; }
   document.getElementById('modalTitle').textContent = '업무 추가';
   document.getElementById('editId').value = '';
   document.getElementById('fSection').value = '대한약학회';
@@ -836,6 +970,7 @@ function openModal() {
 }
 
 function openEdit(id) {
+  if (!getToken()) { showToast('읽기 전용 모드입니다.'); return; }
   const t = tasks.find(t => t.id === id);
   if (!t) return;
   document.getElementById('modalTitle').textContent = '업무 수정';
@@ -870,10 +1005,9 @@ function saveTask() {
     tasks.push({ id: nextId++, ...data });
     showToast('업무가 추가되었습니다.');
   }
-  saveData(); closeModal(); render();
+  closeModal(); render(); scheduleSave();
 }
 
-// ── EXPORT / IMPORT ──────────────────────────────────────────────────────
 function exportData() {
   const payload = { version: 2, period: reportPeriod, exportedAt: new Date().toISOString(), tasks };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -886,6 +1020,7 @@ function exportData() {
 }
 
 function triggerImport() {
+  if (!getToken()) { showToast('읽기 전용 모드입니다. 토큰 설정 후 이용 가능합니다.'); return; }
   document.getElementById('importFile').value = '';
   document.getElementById('importFile').click();
 }
@@ -897,13 +1032,13 @@ function importData(e) {
   reader.onload = ev => {
     try {
       const parsed = JSON.parse(ev.target.result);
-      const importedTasks = parsed.tasks || parsed; // support both v1 and v2
+      const importedTasks = parsed.tasks || parsed;
       if (!Array.isArray(importedTasks)) throw new Error('Invalid format');
-      if (!confirm(`${importedTasks.length}개 항목을 불러올까요? 현재 데이터가 대체됩니다.`)) return;
+      if (!confirm(`${importedTasks.length}개 항목을 불러올까요? 현재 GitHub 데이터가 대체됩니다.`)) return;
       tasks = importedTasks;
       if (parsed.period) reportPeriod = parsed.period;
-      nextId = Math.max(...tasks.map(t => t.id), 99) + 1;
-      saveData(); render();
+      nextId = tasks.length ? Math.max(...tasks.map(t => t.id || 0), 99) + 1 : 100;
+      render(); scheduleSave();
       showToast(`${importedTasks.length}개 업무를 불러왔습니다.`);
     } catch(err) {
       alert('파일 형식이 올바르지 않습니다. JSON 파일을 선택해주세요.');
@@ -912,31 +1047,23 @@ function importData(e) {
   reader.readAsText(file);
 }
 
-// ── UTILS ────────────────────────────────────────────────────────────────
-function escHtml(s) {
-  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-let toastTimer;
-function showToast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
-}
-
-// Close modal on overlay click or ESC
 document.getElementById('modalOverlay').addEventListener('click', function(e) {
   if (e.target === this) closeModal();
 });
+document.getElementById('tokenModalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeTokenModal();
+});
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeModal();
+  if (e.key === 'Escape') { closeModal(); closeTokenModal(); }
 });
 
-// ── INIT ─────────────────────────────────────────────────────────────────
-loadData();
+window.addEventListener('beforeunload', () => {
+  if (syncTimer) { clearTimeout(syncTimer); saveToGitHub(); }
+});
+
+loadFromCache();
 render();
+loadFromGitHub().then(ok => { if (ok) render(); });
 </script>
 </body>
 </html>
