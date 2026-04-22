@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>주간 업무 보고 | Promega Korea</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --deep-galaxy: #13294B;
+    --sol-yellow: #FDB813;
+    --still-water: #455DA0;
+    --clear-skies: #199AC2;
+    --spirit-purple: #713A61;
+    --light-grey: #F5F5F7;
+    --white: #FFFFFF;
+    --done-bg: #D6EAD6; --done-txt: #2E7D32;
+    --prog-bg: #FFF3CD; --prog-txt: #856404;
+    --todo-bg: #FDECEA; --todo-txt: #C62828;
+    --hold-bg: #FFE0B2; --hold-txt: #E65100;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #0E1E35;
+    color: #E8EDF5;
+    min-height: 100vh;
+  }
+
+  /* ── TOP NAV ── */
+  nav {
+    background: var(--deep-galaxy);
+    border-bottom: 3px solid var(--sol-yellow);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    gap: 16px;
+  }
+  .nav-brand { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .nav-logo {
+    width: 28px; height: 28px;
+    background: var(--sol-yellow);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900; color: var(--deep-galaxy);
+  }
+  .nav-title { font-size: 14px; font-weight: 700; color: var(--white); letter-spacing: 0.05em; }
+  .nav-meta { font-size: 12px; color: #7A9CC6; font-family: 'DM Mono', monospace; flex-shrink: 0; }
+  .nav-tabs { display: flex; gap: 4px; flex-shrink: 0; }
+  .nav-tab {
+    padding: 6px 16px; border-radius: 6px; border: none; cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 500;
+    transition: all 0.2s; background: transparent; color: #7A9CC6;
+  }
+  .nav-tab.active { background: var(--sol-yellow); color: var(--deep-galaxy); }
+  .nav-tab:hover:not(.active) { background: rgba(255,255,255,0.08); color: var(--white); }
+
+  /* ── NAV ACTIONS ── */
+  .nav-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .nav-action-btn {
+    padding: 5px 12px; border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: transparent; color: #B0C4DE;
+    font-size: 11px; font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+  }
+  .nav-action-btn:hover { background: rgba(255,255,255,0.1); color: var(--white); }
+  .nav-action-btn.import-btn:hover { border-color: var(--clear-skies); color: var(--clear-skies); }
+
+  /* ── MAIN ── */
+  main { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+
+  /* ── PAGE HEADER ── */
+  .page-header { margin-bottom: 32px; }
+  .report-period {
+    font-family: 'DM Mono', monospace; font-size: 12px;
+    color: var(--sol-yellow); letter-spacing: 0.1em;
+    text-transform: uppercase; margin-bottom: 8px;
+  }
+  .report-title { font-size: 28px; font-weight: 900; color: var(--white); margin-bottom: 4px; }
+  .report-sub { font-size: 13px; color: #7A9CC6; }
+
+  /* Period editor */
+  .period-editor {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px; padding: 4px 10px; margin-top: 12px;
+  }
+  .period-editor label { font-size: 11px; color: #7A9CC6; white-space: nowrap; }
+  .period-input {
+    background: transparent; border: none; outline: none;
+    color: var(--white); font-family: 'DM Mono', monospace;
+    font-size: 12px; width: 220px;
+  }
+  .period-input::placeholder { color: #4A6A8A; }
+
+  /* ── SUMMARY CARDS ── */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px; margin-bottom: 32px;
+  }
+  .summary-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px; padding: 20px;
+    position: relative; overflow: hidden; transition: transform 0.2s;
+  }
+  .summary-card:hover { transform: translateY(-2px); }
+  .summary-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  }
+  .summary-card.total::before { background: var(--still-water); }
+  .summary-card.done::before  { background: var(--done-txt); }
+  .summary-card.prog::before  { background: var(--prog-txt); }
+  .summary-card.todo::before  { background: var(--todo-txt); }
+  .summary-card.hold::before  { background: var(--hold-txt); }
+  .summary-label {
+    font-size: 11px; font-weight: 500; color: #7A9CC6;
+    letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px;
+  }
+  .summary-num {
+    font-size: 36px; font-weight: 900;
+    font-family: 'DM Mono', monospace; line-height: 1; margin-bottom: 6px;
+  }
+  .summary-card.total .summary-num { color: var(--white); }
+  .summary-card.done  .summary-num { color: #4CAF50; }
+  .summary-card.prog  .summary-num { color: var(--sol-yellow); }
+  .summary-card.todo  .summary-num { color: #EF5350; }
+  .summary-card.hold  .summary-num { color: #FF9800; }
+  .summary-bar {
+    height: 4px; background: rgba(255,255,255,0.1);
+    border-radius: 2px; overflow: hidden; margin-top: 10px;
+  }
+  .summary-bar-fill { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
+  .done .summary-bar-fill { background: #4CAF50; }
+  .prog .summary-bar-fill { background: var(--sol-yellow); }
+  .todo .summary-bar-fill { background: #EF5350; }
+  .hold .summary-bar-fill { background: #FF9800; }
+
+  /* ── SECTION PROGRESS ── */
+  .section-progress {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px; padding: 20px 24px; margin-bottom: 32px;
+  }
+  .section-progress-title {
+    font-size: 13px; font-weight: 700; color: #7A9CC6;
+    letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 16px;
+  }
+  .prog-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .prog-label {
+    font-size: 12px; color: #B0C4DE; width: 180px;
+    flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .prog-track { flex: 1; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+  .prog-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--still-water), var(--sol-yellow));
+    border-radius: 3px; transition: width 0.6s ease;
+  }
+  .prog-pct {
+    font-size: 11px; font-family: 'DM Mono', monospace;
+    color: #7A9CC6; width: 36px; text-align: right; flex-shrink: 0;
+  }
+
+  /* ── FILTER BAR ── */
+  .filter-bar {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 24px; flex-wrap: wrap;
+  }
+  .filter-label { font-size: 12px; color: #7A9CC6; font-weight: 500; }
+  .filter-btn {
+    padding: 5px 14px; border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: transparent; color: #B0C4DE;
+    font-size: 12px; font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .filter-btn.active, .filter-btn:hover {
+    background: var(--sol-yellow); border-color: var(--sol-yellow);
+    color: var(--deep-galaxy); font-weight: 700;
+  }
+  .add-btn {
+    margin-left: auto; padding: 8px 20px;
+    background: var(--sol-yellow); color: var(--deep-galaxy);
+    border: none; border-radius: 8px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+  }
+  .add-btn:hover { background: #e5a810; transform: translateY(-1px); }
+
+  /* ── SECTION BLOCK ── */
+  .section-block { margin-bottom: 28px; }
+  .section-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 10px; padding-bottom: 8px;
+    border-bottom: 2px solid rgba(255,255,255,0.06);
+  }
+  .section-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .section-name { font-size: 14px; font-weight: 700; color: var(--white); }
+  .section-sub { font-size: 12px; color: #7A9CC6; }
+  .section-count { margin-left: auto; font-size: 11px; font-family: 'DM Mono', monospace; color: #7A9CC6; }
+
+  /* ── TASK TABLE ── */
+  .task-table {
+    width: 100%; border-collapse: collapse;
+    background: rgba(255,255,255,0.03);
+    border-radius: 10px; overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.07);
+  }
+  .task-table thead th {
+    background: rgba(255,255,255,0.06);
+    padding: 9px 14px; font-size: 11px; font-weight: 700;
+    color: #7A9CC6; text-align: left;
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .task-table tbody tr { border-top: 1px solid rgba(255,255,255,0.04); transition: background 0.15s; }
+  .task-table tbody tr:hover { background: rgba(255,255,255,0.04); }
+  .task-table td { padding: 10px 14px; font-size: 13px; color: #C8D8EA; vertical-align: middle; }
+  .cat-cell { font-size: 11px; font-weight: 700; white-space: nowrap; }
+  .task-cell { max-width: 420px; line-height: 1.5; }
+  .note-cell { font-size: 11px; color: #7A9CC6; max-width: 160px; }
+
+  /* ── STATUS BADGE ── */
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 700; white-space: nowrap;
+    cursor: pointer; transition: all 0.15s; border: none;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+  .badge:hover { filter: brightness(1.1); transform: scale(1.05); }
+  .badge.완료   { background: var(--done-bg); color: var(--done-txt); }
+  .badge.진행중 { background: var(--prog-bg); color: var(--prog-txt); }
+  .badge.미완료 { background: var(--todo-bg); color: var(--todo-txt); }
+  .badge.보류   { background: var(--hold-bg); color: var(--hold-txt); }
+
+  /* ── ACTION BTNS ── */
+  .action-btns { display: flex; gap: 4px; }
+  .act-btn {
+    width: 26px; height: 26px; border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: transparent; color: #7A9CC6; cursor: pointer;
+    font-size: 12px; display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .act-btn:hover { background: rgba(255,255,255,0.1); color: var(--white); }
+  .act-btn.del:hover { background: rgba(239,83,80,0.2); color: #EF5350; border-color: #EF5350; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7); z-index: 200;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #1A2E4A;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 16px; padding: 32px;
+    width: 560px; max-width: 95vw;
+    max-height: 90vh; overflow-y: auto;
+  }
+  .modal-title {
+    font-size: 18px; font-weight: 700; color: var(--white);
+    margin-bottom: 24px; padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .form-group { margin-bottom: 16px; }
+  .form-label {
+    display: block; font-size: 12px; font-weight: 700;
+    color: #7A9CC6; letter-spacing: 0.05em;
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+  .form-input, .form-select, .form-textarea {
+    width: 100%; background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px; padding: 10px 14px;
+    color: var(--white); font-family: 'Noto Sans KR', sans-serif;
+    font-size: 13px; outline: none; transition: border-color 0.2s;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--sol-yellow); }
+  .form-textarea { resize: vertical; min-height: 80px; }
+  .form-select option { background: #1A2E4A; }
+  .modal-btns { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+  .btn-cancel {
+    padding: 9px 20px; border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: transparent; color: #B0C4DE;
+    font-family: 'Noto Sans KR', sans-serif; font-size: 13px; cursor: pointer;
+  }
+  .btn-save {
+    padding: 9px 24px; border-radius: 8px; border: none;
+    background: var(--sol-yellow); color: var(--deep-galaxy);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+  }
+  .btn-save:hover { background: #e5a810; }
+
+  /* ── EMPTY STATE ── */
+  .empty { text-align: center; padding: 40px; color: #7A9CC6; font-size: 13px; }
+
+  /* ── VIEW TOGGLE ── */
+  .view-content { display: none; }
+  .view-content.active { display: block; }
+
+  /* ── REPORT VIEW ── */
+  .report-info {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-left: 4px solid var(--sol-yellow);
+    border-radius: 8px; padding: 16px 20px;
+    margin-bottom: 24px; display: flex;
+    gap: 32px; flex-wrap: wrap;
+    align-items: center;
+  }
+  .info-item { font-size: 13px; color: #B0C4DE; }
+  .info-item span { font-weight: 700; color: var(--white); }
+  .print-btn {
+    margin-left: auto; padding: 8px 18px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px; color: #B0C4DE;
+    font-size: 13px; font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .print-btn:hover { background: rgba(255,255,255,0.15); color: var(--white); }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: #1A2E4A; border: 1px solid rgba(255,255,255,0.15);
+    border-left: 4px solid var(--sol-yellow);
+    border-radius: 10px; padding: 12px 18px;
+    font-size: 13px; color: var(--white);
+    z-index: 999; opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* ── RESET CONFIRM ── */
+  .danger-zone {
+    margin-top: 32px; padding: 16px 20px;
+    border: 1px solid rgba(239,83,80,0.2);
+    border-radius: 10px; display: flex;
+    align-items: center; justify-content: space-between;
+    gap: 16px;
+  }
+  .danger-label { font-size: 12px; color: #EF9090; }
+  .danger-btn {
+    padding: 6px 16px; border-radius: 6px;
+    border: 1px solid rgba(239,83,80,0.4);
+    background: transparent; color: #EF5350;
+    font-size: 12px; font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+  }
+  .danger-btn:hover { background: rgba(239,83,80,0.15); }
+
+  /* ── PRINT STYLES ── */
+  @media print {
+    nav, .filter-bar, .action-btns, .add-btn, .print-btn,
+    .period-editor, .danger-zone, #view-dashboard { display: none !important; }
+    body { background: #fff; color: #000; }
+    main { padding: 0; }
+    .view-content { display: block !important; }
+    #view-dashboard { display: none !important; }
+    #view-report { display: block !important; }
+    .report-info { border: 1px solid #ccc; border-left: 4px solid #FDB813; }
+    .task-table { border: 1px solid #ddd; }
+    .task-table thead th { background: #f5f5f5; color: #333; }
+    .task-table td { color: #333; }
+    .section-name { color: #13294B; }
+    .section-sub { color: #555; }
+    .badge.완료   { background: #D6EAD6; color: #2E7D32; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .badge.진행중 { background: #FFF3CD; color: #856404; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .badge.미완료 { background: #FDECEA; color: #C62828; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .badge.보류   { background: #FFE0B2; color: #E65100; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  @media (max-width: 900px) {
+    .summary-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 768px) {
+    .summary-grid { grid-template-columns: repeat(2, 1fr); }
+    nav { padding: 0 16px; flex-wrap: wrap; height: auto; padding: 10px 16px; gap: 8px; }
+    .nav-meta { display: none; }
+    main { padding: 20px 16px; }
+    .nav-actions { flex-wrap: wrap; }
+    .nav-action-btn { font-size: 10px; padding: 4px 8px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">
+    <div class="nav-logo">P</div>
+    <div class="nav-title">PROMEGA KOREA — 주간 업무 보고</div>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchView('dashboard')">대시보드</button>
+    <button class="nav-tab" onclick="switchView('report')">보고서</button>
+  </div>
+  <div class="nav-actions">
+    <button class="nav-action-btn" onclick="exportData()" title="현재 업무 데이터를 JSON 파일로 저장">↓ 내보내기</button>
+    <button class="nav-action-btn import-btn" onclick="triggerImport()" title="JSON 파일에서 업무 데이터 불러오기">↑ 불러오기</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+  </div>
+  <div class="nav-meta" id="navMeta">불러오는 중...</div>
+</nav>
+
+<main>
+
+  <!-- ── DASHBOARD VIEW ── -->
+  <div class="view-content active" id="view-dashboard">
+
+    <div class="page-header">
+      <div class="report-period" id="dashPeriod">주간 업무 현황</div>
+      <div class="report-title">업무 현황 대시보드</div>
+      <div class="report-sub">정지민 · Marketing Service Team</div>
+      <div class="period-editor">
+        <label>보고 기간</label>
+        <input class="period-input" id="periodInput" placeholder="예: 2026.04.13 — 04.17" oninput="updatePeriod(this.value)">
+      </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-grid">
+      <div class="summary-card total">
+        <div class="summary-label">전체 업무</div>
+        <div class="summary-num" id="cntTotal">0</div>
+        <div style="font-size:11px;color:#7A9CC6;">개 항목</div>
+      </div>
+      <div class="summary-card done">
+        <div class="summary-label">완료</div>
+        <div class="summary-num" id="cntDone">0</div>
+        <div class="summary-bar"><div class="summary-bar-fill" id="barDone" style="width:0%"></div></div>
+      </div>
+      <div class="summary-card prog">
+        <div class="summary-label">진행중</div>
+        <div class="summary-num" id="cntProg">0</div>
+        <div class="summary-bar"><div class="summary-bar-fill" id="barProg" style="width:0%"></div></div>
+      </div>
+      <div class="summary-card todo">
+        <div class="summary-label">미완료</div>
+        <div class="summary-num" id="cntTodo">0</div>
+        <div class="summary-bar"><div class="summary-bar-fill" id="barTodo" style="width:0%"></div></div>
+      </div>
+      <div class="summary-card hold">
+        <div class="summary-label">보류</div>
+        <div class="summary-num" id="cntHold">0</div>
+        <div class="summary-bar"><div class="summary-bar-fill" id="barHold" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <!-- Section Progress -->
+    <div class="section-progress">
+      <div class="section-progress-title">섹션별 진행률</div>
+      <div id="sectionProgress"></div>
+    </div>
+
+    <!-- Filter + Add -->
+    <div class="filter-bar">
+      <span class="filter-label">필터</span>
+      <button class="filter-btn active" onclick="setFilter('전체')">전체</button>
+      <button class="filter-btn" onclick="setFilter('완료')">완료</button>
+      <button class="filter-btn" onclick="setFilter('진행중')">진행중</button>
+      <button class="filter-btn" onclick="setFilter('미완료')">미완료</button>
+      <button class="filter-btn" onclick="setFilter('보류')">보류</button>
+      <button class="add-btn" onclick="openModal()">＋ 업무 추가</button>
+    </div>
+
+    <!-- Task List -->
+    <div id="taskList"></div>
+
+    <!-- Danger Zone -->
+    <div class="danger-zone">
+      <span class="danger-label">⚠ 전체 데이터 초기화 — 기본 샘플 데이터로 되돌립니다.</span>
+      <button class="danger-btn" onclick="resetData()">초기화</button>
+    </div>
+
+  </div>
+
+  <!-- ── REPORT VIEW ── -->
+  <div class="view-content" id="view-report">
+    <div class="page-header">
+      <div class="report-period">보고서 뷰</div>
+      <div class="report-title">주간 업무 보고</div>
+    </div>
+    <div class="report-info">
+      <div class="info-item">보고 기간 <span id="rptPeriodText">—</span></div>
+      <div class="info-item">작성자 <span>정지민 (Marketing Service Team)</span></div>
+      <div class="info-item">보고일 <span id="rptDate">—</span></div>
+      <button class="print-btn" onclick="window.print()">🖨 인쇄 / PDF 저장</button>
+    </div>
+    <div id="reportList"></div>
+  </div>
+
+</main>
+
+<!-- ── MODAL ── -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">업무 추가</div>
+    <input type="hidden" id="editId">
+    <div class="form-group">
+      <label class="form-label">섹션</label>
+      <select class="form-select" id="fSection">
+        <option value="대한약학회">대한약학회</option>
+        <option value="대한기초의학 학회">대한기초의학 학회</option>
+        <option value="Sitecore CMS">Sitecore CMS</option>
+        <option value="Adobe Express / DAM">Adobe Express / DAM</option>
+        <option value="연구자 플라이어">연구자 플라이어</option>
+        <option value="Maxwell CSC">Maxwell CSC</option>
+        <option value="대리점 교육">대리점 교육</option>
+        <option value="내부 미팅">내부 미팅</option>
+        <option value="블로그/콘텐츠">블로그/콘텐츠</option>
+        <option value="IT/시스템">IT/시스템</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">분류</label>
+      <input class="form-input" id="fCat" placeholder="예: 이벤트 기획, 카드 디자인...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">세부 업무 내용</label>
+      <textarea class="form-textarea" id="fTask" placeholder="업무 내용을 입력하세요"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">상태</label>
+      <select class="form-select" id="fStatus">
+        <option value="미완료">미완료</option>
+        <option value="진행중">진행중</option>
+        <option value="완료">완료</option>
+        <option value="보류">보류</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">비고</label>
+      <input class="form-input" id="fNote" placeholder="날짜, 추가 설명...">
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">취소</button>
+      <button class="btn-save" onclick="saveTask()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── SECTION CONFIG ──────────────────────────────────────────────────────
+const SECTIONS = [
+  { id: '대한약학회',          name: '대한약학회 (춘계)',                    sub: '4월 23~24일 • 청주 OSCO',      color: '#1565C0' },
+  { id: '대한기초의학 학회',   name: '대한기초의학 학회',                    sub: '4월 29~30일',                   color: '#6A1B9A' },
+  { id: 'Sitecore CMS',        name: 'Sitecore CMS 작업',                   sub: 'promega.kr',                    color: '#2E7D32' },
+  { id: 'Adobe Express / DAM', name: 'Adobe Express / DAM',                 sub: '툴 설정 및 이메일 협업',        color: '#795548' },
+  { id: '연구자 플라이어',     name: '연구자 논문 공유 네트워크 플라이어',   sub: '제작 진행',                     color: '#1565C0' },
+  { id: 'Maxwell CSC',         name: 'Maxwell CSC Application List',         sub: 'PDF 브랜딩 검토',               color: '#C62828' },
+  { id: '대리점 교육',         name: '대리점 온라인 교육',                   sub: '4월 15일',                      color: '#558B2F' },
+  { id: '내부 미팅',           name: '내부 미팅',                            sub: '',                              color: '#424242' },
+  { id: '블로그/콘텐츠',       name: '블로그 / 콘텐츠 제작',                 sub: 'Ask Promega 네이버 블로그',     color: '#E65100' },
+  { id: 'IT/시스템',           name: 'IT / 시스템',                          sub: '',                              color: '#4527A0' },
+];
+
+// ── DEFAULT DATA ─────────────────────────────────────────────────────────
+const DEFAULT_TASKS = [
+  { id:1,  section:'대한약학회',         cat:'이벤트 기획·운영', task:'박스 기획: 불투명 박스 + 프로메가 디자인, 상단 손구멍 구조 결정', status:'완료',   note:'' },
+  { id:2,  section:'대한약학회',         cat:'물품 준비',        task:'대한약학회·기초의학 경품 박스 물품 팩킹 리스트 작성',             status:'완료',   note:'' },
+  { id:3,  section:'대한약학회',         cat:'인쇄 발주',        task:'경품 카드 4종 + 폼보드 인쇄 발주',                                status:'완료',   note:'4/17 납품 완료, 실물 확인 필요' },
+  { id:4,  section:'대한약학회',         cat:'선물 준비',        task:'수량 확정 품목 준비 중: 볼펜/노트(각 100) · 에코백(30) · 루미인형(30) · 노트북파우치(2) · 텀블러(30) · 고래키링(5) · 가죽필통(3)', status:'진행중', note:'4월 21일 최종 컨펌 이후 패킹 준비 예정' },
+  { id:5,  section:'대한기초의학 학회',  cat:'물품 준비',        task:'기초의학 학회 경품 물품 팩킹 리스트 작성',                        status:'완료',   note:'' },
+  { id:6,  section:'대한기초의학 학회',  cat:'인쇄 발주',        task:'경품 카드 4종 + 폼보드 인쇄 발주',                                status:'완료',   note:'4/17 납품 완료, 실물 확인 필요' },
+  { id:7,  section:'대한기초의학 학회',  cat:'선물 준비',        task:'수량 확정 품목 준비 중: 볼펜/노트(각 100) · 에코백(30) · 노트북스티커(30) · 루미인형(30) · 맥스웰레고(2) · 텀블러(30) · 고래키링(5) · 가죽필통(3)', status:'진행중', note:'4월 21일 최종 컨펌 이후 패킹 준비 예정' },
+  { id:8,  section:'Sitecore CMS',      cat:'Connections',      task:'Drug Discovery 게시글 추가 (Tivantinib 페이지)',                   status:'완료',   note:'Drug Discovery 카테고리, 추가 완료' },
+  { id:9,  section:'Sitecore CMS',      cat:'Connections',      task:'Tivantinib 아티클 페이지 가독성 확보 (문구·여백·볼드체)',          status:'완료',   note:'가독성을 위한 내용 수정 완료' },
+  { id:10, section:'Sitecore CMS',      cat:'타일 URL 수정',    task:'BRETSA Target Engagement 페이지 Blog 타일 URL 수정 요청',          status:'진행중', note:'글로벌 페이지 권한 부족 → 본사 에스컬레이션 (Sitecore 팀즈 게시판 요청 중)' },
+  { id:11, section:'Sitecore CMS',      cat:'웨비나',           task:'Global Webinar 타일 링크 URL 추가',                                status:'완료',   note:'' },
+  { id:12, section:'Sitecore CMS',      cat:'Sitecore 계정',    task:'Sitecore 개인 계정 발급 팔로업 이메일 발송 (INC-151341)',           status:'진행중', note:'4/16 Service Desk 재문의' },
+  { id:13, section:'Sitecore CMS',      cat:'Sitecore',         task:'RTM 전환 추적',                                                   status:'진행중', note:'' },
+  { id:14, section:'Sitecore CMS',      cat:'Sitecore',         task:'아티클 내 사이드바 배경색 제거',                                  status:'진행중', note:'' },
+  { id:15, section:'Sitecore CMS',      cat:'Sitecore',         task:'Sticky Banner 적용 (슬라이드1 - 3번)',                             status:'진행중', note:'금주 내 업데이트 예정' },
+  { id:16, section:'Sitecore CMS',      cat:'Sitecore',         task:'[3D Assay 리서치 리소스] 섹션 내 텍스트 정렬/여백 및 타일 문제 (슬라이드2 - 8번)', status:'진행중', note:'금주 내 업데이트 예정' },
+  { id:17, section:'Sitecore CMS',      cat:'Sitecore',         task:'Promotional Offers 페이지 웨비나 섹션 구분선 → 브랜딩 박스 형태 변환 (이수연 책임님 요청)', status:'진행중', note:'금주 수정 예정' },
+  { id:18, section:'Adobe Express / DAM', cat:'Adobe Express',  task:'Ryan Engel (본사) Adobe Express 워크스페이스 설정 요청 이메일 수신 및 회신 (4/16~17)', status:'완료', note:'' },
+  { id:19, section:'Adobe Express / DAM', cat:'Adobe Express',  task:'Promega Korea 워크스페이스 생성 확인',                            status:'완료',   note:'' },
+  { id:20, section:'Adobe Express / DAM', cat:'CC 설치',        task:'Adobe Creative Cloud 설치 이슈 티켓 (INC-151514) 처리 완료 — Service Desk 원격 지원', status:'완료', note:'4/15 티켓 완료 / 추후 노트북 변경 시 재설치 필요' },
+  { id:21, section:'Adobe Express / DAM', cat:'이수연 책임 공유', task:'PromeTech_Seminar_A4_1 Adobe Express 파일 — 이수연 책임 접근 요청 승인', status:'완료', note:'4/17' },
+  { id:22, section:'연구자 플라이어',   cat:'플라이어 제작',    task:'컨펌 전 최종 후보 2종 완성 — 통계바 색상 버전 각 1종 (Sol Yellow / Spirit Purple)', status:'진행중', note:'컨펌 대기' },
+  { id:23, section:'연구자 플라이어',   cat:'QR 코드',          task:'CTA 푸터 QR 코드 2종 삽입 완료 (신청 QR · 카카오톡 상담)',         status:'완료',   note:'' },
+  { id:24, section:'Maxwell CSC',       cat:'Application 검토', task:'Maxwell CSC Application List PDF p.3~4 브랜딩 검토',               status:'완료',   note:'' },
+  { id:25, section:'Maxwell CSC',       cat:'PDF 수정 요청',    task:'IVD 배지 색상 / 페이지 레이아웃 재구성 / 체크 아이콘 교체 등 벤더 수정 요청 사항 정리', status:'완료', note:'' },
+  { id:26, section:'대리점 교육',       cat:'대리점 교육',      task:'프로메가 제품 선택가이드 대리점 온라인 교육 참관 (이수연 책임 주관)', status:'완료',  note:'4/15 09:00~10:30 SEO-MAXWELL' },
+  { id:27, section:'내부 미팅',         cat:'Marketing Service MTG', task:'김미경 책임 주관 Marketing Service 미팅 (매주 수요일)',        status:'완료',   note:'4/14 09:00 SEO-GLO-ING' },
+  { id:28, section:'내부 미팅',         cat:'Sales Ops Intro.', task:'Sales Operation 부서 인트로 미팅 주관 (박선영·김미경 책임 참석)',   status:'완료',   note:'4/14 14:00 SEO-GLO-ING' },
+  { id:29, section:'내부 미팅',         cat:'MKT Science Intro.', task:'MKT Science 부서 인트로 미팅 주관 (권정은·김미경 책임 참석)',    status:'완료',   note:'4/14 15:00 SEO-GLO-ING' },
+  { id:30, section:'내부 미팅',         cat:'Merit Meeting',    task:'CY2026 Merit Increase 미팅 주관 (김광일 팀장 참석)',               status:'완료',   note:'4/15 15:00 SEO-GLO-ING' },
+  { id:31, section:'블로그/콘텐츠',     cat:'블로그 FAQ 포스터', task:'"Ask Promega" 네이버 블로그 FAQ 포스터 시리즈 제작 진행',          status:'진행중', note:'금주 내 컨펌 예정' },
+  { id:32, section:'IT/시스템',         cat:'디스크 용량',      task:'디스크 공간 부족 문제 (INC-151965) Service Desk 원격 접속 해결 — 60GB 확보', status:'완료', note:'4/16 해결 / 추후 추가 컴퓨터 확보 후 어도비 Apps 설치 예정' },
+];
+
+// ── STATE ────────────────────────────────────────────────────────────────
+let tasks = [];
+let reportPeriod = '2026.04.13 — 04.17';
+let currentFilter = '전체';
+let nextId = 100;
+
+function loadData() {
+  try {
+    const saved = localStorage.getItem('promega_tasks_v2');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      tasks = parsed.tasks || DEFAULT_TASKS;
+      reportPeriod = parsed.period || reportPeriod;
+      nextId = Math.max(...tasks.map(t => t.id), 99) + 1;
+    } else {
+      tasks = DEFAULT_TASKS;
+      nextId = 200;
+      saveData();
+    }
+  } catch(e) {
+    tasks = DEFAULT_TASKS;
+  }
+}
+
+function saveData() {
+  try {
+    localStorage.setItem('promega_tasks_v2', JSON.stringify({ tasks, period: reportPeriod }));
+  } catch(e) {}
+}
+
+// ── RENDER ───────────────────────────────────────────────────────────────
+function render() {
+  updateSummary();
+  renderSectionProgress();
+  renderTaskList();
+  renderReport();
+  document.getElementById('navMeta').textContent =
+    `총 ${tasks.length}개 · 완료 ${tasks.filter(t=>t.status==='완료').length}개`;
+  document.getElementById('dashPeriod').textContent = reportPeriod;
+  document.getElementById('periodInput').value = reportPeriod;
+
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth()+1).padStart(2,'0');
+  const dd = String(today.getDate()).padStart(2,'0');
+  const days = ['일','월','화','수','목','금','토'];
+  document.getElementById('rptDate').textContent = `${yyyy}년 ${mm}월 ${dd}일(${days[today.getDay()]})`;
+  document.getElementById('rptPeriodText').textContent = reportPeriod;
+}
+
+function updateSummary() {
+  const total = tasks.length;
+  const done  = tasks.filter(t => t.status === '완료').length;
+  const prog  = tasks.filter(t => t.status === '진행중').length;
+  const todo  = tasks.filter(t => t.status === '미완료').length;
+  const hold  = tasks.filter(t => t.status === '보류').length;
+  document.getElementById('cntTotal').textContent = total;
+  document.getElementById('cntDone').textContent  = done;
+  document.getElementById('cntProg').textContent  = prog;
+  document.getElementById('cntTodo').textContent  = todo;
+  document.getElementById('cntHold').textContent  = hold;
+  const base = total || 1;
+  document.getElementById('barDone').style.width = (done/base*100)+'%';
+  document.getElementById('barProg').style.width = (prog/base*100)+'%';
+  document.getElementById('barTodo').style.width = (todo/base*100)+'%';
+  document.getElementById('barHold').style.width = (hold/base*100)+'%';
+}
+
+function renderSectionProgress() {
+  const el = document.getElementById('sectionProgress');
+  el.innerHTML = SECTIONS.map(sec => {
+    const secTasks = tasks.filter(t => t.section === sec.id);
+    if (!secTasks.length) return '';
+    const done = secTasks.filter(t => t.status === '완료').length;
+    const pct = Math.round(done / secTasks.length * 100);
+    return `<div class="prog-row">
+      <div class="prog-label">${sec.name}</div>
+      <div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div>
+      <div class="prog-pct">${pct}%</div>
+    </div>`;
+  }).join('');
+}
+
+function renderTaskList() {
+  const el = document.getElementById('taskList');
+  const filtered = currentFilter === '전체' ? tasks : tasks.filter(t => t.status === currentFilter);
+
+  let html = '';
+  SECTIONS.forEach(sec => {
+    const secTasks = filtered.filter(t => t.section === sec.id);
+    if (!secTasks.length) return;
+    const allTasks = tasks.filter(t => t.section === sec.id);
+    const done = allTasks.filter(t => t.status === '완료').length;
+
+    html += `<div class="section-block">
+      <div class="section-header">
+        <div class="section-dot" style="background:${sec.color}"></div>
+        <div class="section-name">${sec.name}</div>
+        ${sec.sub ? `<div class="section-sub">${sec.sub}</div>` : ''}
+        <div class="section-count">${done}/${allTasks.length} 완료</div>
+      </div>
+      <table class="task-table">
+        <thead><tr>
+          <th style="width:130px">분류</th>
+          <th>세부 업무 내용</th>
+          <th style="width:80px">상태</th>
+          <th style="width:160px">비고</th>
+          <th style="width:64px"></th>
+        </tr></thead>
+        <tbody>`;
+
+    secTasks.forEach(t => {
+      html += `<tr>
+        <td class="cat-cell" style="color:${sec.color}">${escHtml(t.cat)}</td>
+        <td class="task-cell">${escHtml(t.task)}</td>
+        <td><button class="badge ${t.status}" onclick="cycleStatus(${t.id})" title="클릭하여 상태 변경">${t.status}</button></td>
+        <td class="note-cell">${escHtml(t.note)}</td>
+        <td><div class="action-btns">
+          <button class="act-btn" onclick="openEdit(${t.id})" title="수정">✎</button>
+          <button class="act-btn del" onclick="deleteTask(${t.id})" title="삭제">✕</button>
+        </div></td>
+      </tr>`;
+    });
+    html += `</tbody></table></div>`;
+  });
+
+  el.innerHTML = html || `<div class="empty">해당 상태의 업무가 없습니다.</div>`;
+}
+
+function renderReport() {
+  const el = document.getElementById('reportList');
+  let html = '';
+  SECTIONS.forEach(sec => {
+    const secTasks = tasks.filter(t => t.section === sec.id);
+    if (!secTasks.length) return;
+    html += `<div class="section-block">
+      <div class="section-header">
+        <div class="section-dot" style="background:${sec.color}"></div>
+        <div class="section-name">${sec.name}</div>
+        ${sec.sub ? `<div class="section-sub">${sec.sub}</div>` : ''}
+      </div>
+      <table class="task-table">
+        <thead><tr>
+          <th style="width:140px">분류</th>
+          <th>세부 업무 내용</th>
+          <th style="width:80px">상태</th>
+          <th style="width:160px">비고</th>
+        </tr></thead>
+        <tbody>`;
+    secTasks.forEach(t => {
+      html += `<tr>
+        <td class="cat-cell" style="color:${sec.color}">${escHtml(t.cat)}</td>
+        <td class="task-cell">${escHtml(t.task)}</td>
+        <td><span class="badge ${t.status}">${t.status}</span></td>
+        <td class="note-cell">${escHtml(t.note)}</td>
+      </tr>`;
+    });
+    html += `</tbody></table></div>`;
+  });
+  el.innerHTML = html;
+}
+
+// ── PERIOD ───────────────────────────────────────────────────────────────
+function updatePeriod(val) {
+  reportPeriod = val;
+  document.getElementById('dashPeriod').textContent = val || '—';
+  document.getElementById('rptPeriodText').textContent = val || '—';
+  saveData();
+}
+
+// ── ACTIONS ──────────────────────────────────────────────────────────────
+const STATUS_CYCLE = { '미완료':'진행중', '진행중':'완료', '완료':'미완료', '보류':'미완료' };
+
+function cycleStatus(id) {
+  const t = tasks.find(t => t.id === id);
+  if (t) { t.status = STATUS_CYCLE[t.status] || '진행중'; saveData(); render(); }
+}
+
+function deleteTask(id) {
+  if (!confirm('이 업무를 삭제할까요?')) return;
+  tasks = tasks.filter(t => t.id !== id);
+  saveData(); render();
+  showToast('업무가 삭제되었습니다.');
+}
+
+function setFilter(f) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent === f);
+  });
+  renderTaskList();
+}
+
+function switchView(v) {
+  document.querySelectorAll('.view-content').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach((b,i) => {
+    b.classList.toggle('active', (i===0 && v==='dashboard') || (i===1 && v==='report'));
+  });
+}
+
+function resetData() {
+  if (!confirm('모든 데이터를 초기화하고 샘플 데이터로 되돌릴까요?\n이 작업은 되돌릴 수 없습니다.')) return;
+  tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
+  nextId = 200;
+  saveData(); render();
+  showToast('초기화 완료.');
+}
+
+// ── MODAL ────────────────────────────────────────────────────────────────
+function openModal() {
+  document.getElementById('modalTitle').textContent = '업무 추가';
+  document.getElementById('editId').value = '';
+  document.getElementById('fSection').value = '대한약학회';
+  document.getElementById('fCat').value = '';
+  document.getElementById('fTask').value = '';
+  document.getElementById('fStatus').value = '미완료';
+  document.getElementById('fNote').value = '';
+  document.getElementById('modalOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('fCat').focus(), 100);
+}
+
+function openEdit(id) {
+  const t = tasks.find(t => t.id === id);
+  if (!t) return;
+  document.getElementById('modalTitle').textContent = '업무 수정';
+  document.getElementById('editId').value = id;
+  document.getElementById('fSection').value = t.section;
+  document.getElementById('fCat').value = t.cat;
+  document.getElementById('fTask').value = t.task;
+  document.getElementById('fStatus').value = t.status;
+  document.getElementById('fNote').value = t.note;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+function saveTask() {
+  const editId = document.getElementById('editId').value;
+  const data = {
+    section: document.getElementById('fSection').value,
+    cat:     document.getElementById('fCat').value.trim(),
+    task:    document.getElementById('fTask').value.trim(),
+    status:  document.getElementById('fStatus').value,
+    note:    document.getElementById('fNote').value.trim(),
+  };
+  if (!data.task) { alert('세부 업무 내용을 입력해주세요.'); return; }
+  if (editId) {
+    const t = tasks.find(t => t.id === parseInt(editId));
+    if (t) Object.assign(t, data);
+    showToast('업무가 수정되었습니다.');
+  } else {
+    tasks.push({ id: nextId++, ...data });
+    showToast('업무가 추가되었습니다.');
+  }
+  saveData(); closeModal(); render();
+}
+
+// ── EXPORT / IMPORT ──────────────────────────────────────────────────────
+function exportData() {
+  const payload = { version: 2, period: reportPeriod, exportedAt: new Date().toISOString(), tasks };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const dateStr = new Date().toISOString().slice(0,10).replace(/-/g,'');
+  a.href = url; a.download = `promega_weekly_${dateStr}.json`;
+  a.click(); URL.revokeObjectURL(url);
+  showToast('데이터가 저장되었습니다.');
+}
+
+function triggerImport() {
+  document.getElementById('importFile').value = '';
+  document.getElementById('importFile').click();
+}
+
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const parsed = JSON.parse(ev.target.result);
+      const importedTasks = parsed.tasks || parsed; // support both v1 and v2
+      if (!Array.isArray(importedTasks)) throw new Error('Invalid format');
+      if (!confirm(`${importedTasks.length}개 항목을 불러올까요? 현재 데이터가 대체됩니다.`)) return;
+      tasks = importedTasks;
+      if (parsed.period) reportPeriod = parsed.period;
+      nextId = Math.max(...tasks.map(t => t.id), 99) + 1;
+      saveData(); render();
+      showToast(`${importedTasks.length}개 업무를 불러왔습니다.`);
+    } catch(err) {
+      alert('파일 형식이 올바르지 않습니다. JSON 파일을 선택해주세요.');
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ── UTILS ────────────────────────────────────────────────────────────────
+function escHtml(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+let toastTimer;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// Close modal on overlay click or ESC
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+// ── INIT ─────────────────────────────────────────────────────────────────
+loadData();
+render();
+</script>
+</body>
+</html>
